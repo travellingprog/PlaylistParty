@@ -1,0 +1,21 @@
+<head>
+  <title>Playlist Party</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+  {{> page}}
+</body>
+
+<template name="page">
+  <h1>Playlist Party!</h1>
+  <div id="ytplayer"></div>
+  <div>{{instructions}}</div>
+  {{> controls}}
+</template>
+
+<template name="controls">
+  <div>
+    <input type="button" class="playback" value="{{playOrPause}}" />
+  </div>  
+</template>
