@@ -115,6 +115,7 @@ Template.page.instructions = function () {
 
 Session.set("playing", false);
 Session.set("volume", 50);
+Session.set("mute", false);
 
 
 Template.controls.playOrPause = function() {
@@ -124,6 +125,11 @@ Template.controls.playOrPause = function() {
 
 Template.controls.volValue = function() {
   return Session.get("volume");
+};
+
+
+Template.controls.muteOrUnmute = function() {
+  return Session.get("mute") ? "Unmute" : "Mute";
 };
 
 
@@ -155,6 +161,17 @@ Template.controls.events({
     if (volume > 100) volume = 100;
     Session.set("volume", volume);
     if (ytplayer) ytplayer.setVolume( volToYT(volume) );
+  },
+
+
+  'click input.muteCtrl' : function() {
+    if ( ytplayer && Session.get("mute") ) {
+      ytplayer.unMute();
+      Session.set("mute", false);
+    } else if (ytplayer) {
+      ytplayer.mute();
+      Session.set("mute", true);
+    }
   }
 });
 
