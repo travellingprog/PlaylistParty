@@ -1,4 +1,16 @@
 ///////////////////////////////////////////////////////////////////////////////
+// Meteor Collection subscription
+
+var testList = "fdfb45a8-f87c-460b-bdee-7933fdd75ecc";
+var list;
+Meteor.subscribe("playlists", testList, function() {
+  list = Playlists.findOne({});
+});  
+
+// ^ ...maybe place after API is loaded?
+
+
+///////////////////////////////////////////////////////////////////////////////
 // YouTube
 
 // load the YouTube IFrame Player API code
