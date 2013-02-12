@@ -1,6 +1,7 @@
 <head>
   <title>Playlist Party</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 </head>
 
 <body>
@@ -17,5 +18,10 @@
 <template name="controls">
   <div>
     <input type="button" class="playback" value="{{playOrPause}}" />
+    <fieldset class="volControl">
+      <legend>Volume: ({{volValue}}/100)</legend>
+      <input type="button" class="decVolume" value="decrease" />
+      <input type="button" class="incVolume" value="increase" />
+    </fieldset>
   </div>  
 </template>
