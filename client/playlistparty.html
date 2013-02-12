@@ -24,5 +24,10 @@
       <input type="button" class="incVolume" value="increase" />
     </fieldset>
     <input type="button" class="muteCtrl" value="{{muteOrUnmute}}" />
-  </div>  
+    <fieldset class="timeControl">
+      <legend>Time: ({{curTime}}/{{totalTime}})</legend>
+      <input type="button" class="decTime" value="<<" />
+      <input type="button" class="incTime" value=">>" />
+    </fieldset>
+  </div>
 </template>

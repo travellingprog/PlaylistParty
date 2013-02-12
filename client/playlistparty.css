@@ -1,4 +1,4 @@
 /* CSS declarations go here */
-.volControl {
+.volControl, .timeControl {
   display: inline;
 }

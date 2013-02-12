@@ -38,6 +38,8 @@ var onPlayerReady = function(event) {
   vidID = getYoutubeID(player.getVideoUrl());
   if (! vidID === "") player.cueVideoById(vidID);
 
+  Session.set("totalTime", player.getDuration() );
+
   // set periodic updates
   setInterval(updatePlayerInfo, 250);
 };
@@ -51,22 +53,27 @@ var getYoutubeID = function(vidURL) {
 
 
 var updatePlayerInfo = function() {
-  // if(ytplayer && ytplayer.getDuration) {
-  //   updateHTML("videoDuration", ytplayer.getDuration());
-  //   updateHTML("videoCurrentTime", ytplayer.getCurrentTime());
+  if(ytplayer) {
+    Session.set( "volume", volFromYT(ytplayer.getVolume()) );
+    Session.set( "curTime", Math.ceil(ytplayer.getCurrentTime()) );
   //   updateHTML("bytesTotal", ytplayer.getVideoBytesTotal());
   //   updateHTML("startBytes", ytplayer.getVideoStartBytes());
   //   updateHTML("bytesLoaded", ytplayer.getVideoBytesLoaded());
-  // }  
+  }  
 };
 
 
 var onPlayerStateChange = function(event) {
   var newState = event.data;
+  var player = event.target;
+  var state = YT.PlayerState;
 
-  if (newState == YT.PlayerState.PLAYING) {
+  if (newState === state.PLAYING) {
     // make sure video volume matches our control volume
-    event.target.setVolume( volToYT(Session.get("volume")) );
+    player.setVolume( volToYT(Session.get("volume")) );
+    Session.set("playing", true);
+  } else if ((newState === state.PAUSED) || (newState === state.ENDED)) {
+    Session.set("playing", false);
   }
 };
 
@@ -116,6 +123,8 @@ Template.page.instructions = function () {
 Session.set("playing", false);
 Session.set("volume", 50);
 Session.set("mute", false);
+Session.set("curTime", 0);
+Session.set("totalTime", 0);
 
 
 Template.controls.playOrPause = function() {
@@ -130,6 +139,45 @@ Template.controls.volValue = function() {
 
 Template.controls.muteOrUnmute = function() {
   return Session.get("mute") ? "Unmute" : "Mute";
+};
+
+
+Template.controls.curTime = function() {
+  return showTime(Session.get("curTime"));
+};
+
+
+Template.controls.totalTime = function() {
+  return showTime(Session.get("totalTime"));
+};
+
+
+var showTime = function(total) {
+  // format the time, received in number of seconds
+  var hour, min, sec;
+  
+  if (total >= 3600) {
+    hour = Math.floor(total / 3600);
+    total = total % 3600;
+    if (hour < 10) hour = '0' + hour;
+    hour = hour + ':';
+  } else {
+    hour = '';
+  }
+
+  if (total >= 60) {
+    min = Math.floor(total / 60);
+    total = total % 60;
+    if (min < 10) min = '0' + min;
+    min = min + ':';
+  } else {
+    min = '00:';
+  }
+
+  sec = Math.round(total);
+  // sec = total;
+  if (sec < 10) sec = '0' + sec;
+  return hour + min + sec;
 };
 
 
@@ -172,6 +220,25 @@ Template.controls.events({
       ytplayer.mute();
       Session.set("mute", true);
     }
+  },
+
+
+  'click input.decTime' : function() {
+    var step = Math.ceil(Session.get("totalTime") / 10);  // <- Set as variable?
+    var newTime = Session.get("curTime") - step;
+    if (newTime < 0) newTime = 0;
+    // Session.set("curTime", newTime);   <- FUTURE USE, maybe
+    ytplayer.seekTo(newTime, true);
+  },
+
+
+  'click input.incTime' : function() {
+    totalTime = Session.get("totalTime")
+    var step = Math.ceil(totalTime / 10);
+    var newTime = Session.get("curTime") + step;
+    if (newTime > totalTime) newTime = totalTime;
+    // Session.set("curTime", newTime);   <- FUTURE USE, maybe
+    ytplayer.seekTo(newTime, true);
   }
 });
 
