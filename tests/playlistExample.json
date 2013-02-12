@@ -1,0 +1,12 @@
+{
+  "listID" : "000001"
+  "listName" : "My Playlist!",
+  "public" : true,
+  "password" : "encPassword",
+  "items" : [
+    {
+      "type" : "YouTube",
+      "id" : "V_QyvLX4h2k"
+    }
+  ]
+}
