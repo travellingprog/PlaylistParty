@@ -9,10 +9,15 @@
 </body>
 
 <template name="page">
-  <h1>Playlist Party!</h1>
+  {{> header}}
   <div id="ytplayer"></div>
   <div>{{instructions}}</div>
   {{> controls}}
+</template>
+
+<template name="header">
+  <h1>Playlist Party!</h1>
+  <h2>{{playlistName}}</h2>
 </template>
 
 <template name="controls">

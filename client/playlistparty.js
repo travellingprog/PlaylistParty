@@ -2,10 +2,9 @@
 // Meteor Collection subscription
 
 var testList = "7bd9497a-de64-4535-b63c-ae4c772491e1";
-var list;
 
 Meteor.subscribe("playlist", testList, function() {
-  list = Playlist.findOne({});
+  Session.set("listName", Playlist.findOne({}).name);
 });
 
 Meteor.subscribe("items", testList);
@@ -126,6 +125,15 @@ var volFromYT = function(YTvolume) {
 
 Template.page.instructions = function () {
   return "Use the controls below.";
+};
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Header template
+
+
+Template.header.playlistName = function() {
+  return Session.get("listName");
 };
 
 
