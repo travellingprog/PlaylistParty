@@ -1,11 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Meteor Collection subscription
 
-var testList = "fdfb45a8-f87c-460b-bdee-7933fdd75ecc";
+var testList = "7bd9497a-de64-4535-b63c-ae4c772491e1";
 var list;
-Meteor.subscribe("playlists", testList, function() {
-  list = Playlists.findOne({});
-});  
+
+Meteor.subscribe("playlist", testList, function() {
+  list = Playlist.findOne({});
+});
+
+Meteor.subscribe("items", testList);
 
 // ^ ...maybe place after API is loaded?
 
@@ -68,9 +71,6 @@ var updatePlayerInfo = function() {
   if(ytplayer) {
     Session.set( "volume", volFromYT(ytplayer.getVolume()) );
     Session.set( "curTime", Math.ceil(ytplayer.getCurrentTime()) );
-  //   updateHTML("bytesTotal", ytplayer.getVideoBytesTotal());
-  //   updateHTML("startBytes", ytplayer.getVideoStartBytes());
-  //   updateHTML("bytesLoaded", ytplayer.getVideoBytesLoaded());
   }  
 };
 

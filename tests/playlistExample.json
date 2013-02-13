@@ -1,13 +1,6 @@
 {
   "_id" : //some auto-generated unique identifier
-  "listName" : "My Playlist!",
+  "name" : "My Playlist!",
   "public" : true,
-  "password" : "encPassword",
-  "items" : [
-    {
-      "type" : "YouTube",
-      "id" : "V_QyvLX4h2k",
-      "seqNo": 1
-    }
-  ]
+  "password" : "encPassword"
 }

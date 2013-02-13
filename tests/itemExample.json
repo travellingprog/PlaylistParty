@@ -1,0 +1,8 @@
+{
+  "_id" :  //some auto-generated unique identifier
+  "playlistID" : //the auto-generated identifer for the playlist
+  "type" : "YouTube",
+  "streamID" : "V_QyvLX4h2k",
+  "seqNo": 1
+  "addedBy": "user1"
+}
