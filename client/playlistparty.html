@@ -10,8 +10,7 @@
 
 <template name="page">
   {{> header}}
-  <div id="ytplayer"></div>
-  <div>{{instructions}}</div>
+  {{> tracks}}
   {{> controls}}
 </template>
 
@@ -19,6 +18,25 @@
   <h1>Playlist Party!</h1>
   <h2>{{playlistName}}</h2>
 </template>
+
+
+<template name="tracks">
+  {{#if itemsLoaded}}
+  {{#each items}}
+    {{> player}}
+  {{/each}}
+  {{/if}}
+</template>
+
+
+<template name="player">
+  <div class="playerItem">
+    {{#constant}}
+    <div id="{{_id}}"></div>
+    {{/constant}}
+  </div>
+</template>
+
 
 <template name="controls">
   <div>

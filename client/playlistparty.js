@@ -3,17 +3,112 @@
 
 var testList = "7bd9497a-de64-4535-b63c-ae4c772491e1";
 
+
 Meteor.subscribe("playlist", testList, function() {
   Session.set("listName", Playlist.findOne({}).name);
 });
 
-Meteor.subscribe("items", testList);
 
-// ^ ...maybe place after API is loaded?
+Session.set("itemsLoaded", false);
+Meteor.subscribe("items", testList, function() {
+    Session.set("itemsLoaded", true);
+});
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// YouTube
+// Player Object
+
+var player = Object();
+var curPlayer;
+
+var Player = function(embedPlayer, userID) {
+
+  this.addedBy = function(user){
+    return (user === userID);
+  }
+
+  this.play = function () { 
+    embedPlayer.play(); 
+  };
+  
+  this.pause = function () { 
+    embedPlayer.pause(); 
+  };
+  
+  this.setVolume = function (newVolume) { 
+    embedPlayer.setVolume(newVolume); 
+  };
+
+  this.getVolume = function () { 
+    return embedPlayer.getVolume(); 
+  };
+
+  this.mute = function () {
+    embedPlayer.mute();
+  }
+
+  this.unMute = function () {
+    embedPlayer.unMute();
+  }
+  
+  this.setNewTime = function (newTime) {
+    embedPlayer.setNewTime(newTime);
+  }
+
+  this.getCurrentTime = function() {
+    return embedPlayer.getCurrentTime();
+  };
+
+  this.getDuration = function() {
+    return embedPlayer.getDuration();
+  };
+};
+
+
+var createPlayer = function(item) {
+
+  if (item.type === "YouTube") {
+    player[item._id] = new Player(new YtPlayer(item._id, item.streamID), 
+                                  item.addedBy);
+  }
+
+  if ((! curPlayer) && (item.seqNo === 1)) curPlayer = player[item._id];
+};
+
+
+// set items observation
+var items, itemHandle;
+var itemsObservation = function(handle) {
+  // Don't observe items until the YouTube API is ready
+  if (! Session.equals("YtAPIready", true)) return;
+  if (! Session.equals("itemsLoaded", true)) return;
+
+  // disable Meteor.autorun() if you get here
+  handle.stop();  
+
+  items = Items.find({},{sort: {seqNo: 1}});
+  itemHandle = items.observe({
+    added: createPlayer
+  });
+};
+
+Meteor.autorun(itemsObservation);
+
+
+// set periodic updates
+var updatePlayerInfo = function() {
+  if(curPlayer) {
+    Session.set("volume", curPlayer.getVolume() );
+    Session.set("curTime", curPlayer.getCurrentTime());
+    Session.set("totalTime", curPlayer.getDuration());
+  }  
+};
+
+setInterval(updatePlayerInfo, 250);
+
+
+///////////////////////////////////////////////////////////////////////////////
+// YouTube API code
 
 // load the YouTube IFrame Player API code
 var loadYTplayerAPI = function () {
@@ -31,101 +126,10 @@ var loadYTplayerAPI = function () {
 };
 
 
-// when the API is ready, load the YouTube player
-var ytplayer;
+// Signal when the Youtube API is ready, to load the YouTube player
 var onYouTubeIframeAPIReady = function () {
-  ytplayer = new YT.Player('ytplayer', {
-    height: '390',
-    width: '640',
-    videoId: 'V_QyvLX4h2k',
-    events: {
-      'onReady': onPlayerReady,
-      'onStateChange': onPlayerStateChange
-    }
-  });
-};
-
-
-var onPlayerReady = function(event) {
-  // cue video
-  player = event.target;
-  vidID = getYoutubeID(player.getVideoUrl());
-  if (! vidID === "") player.cueVideoById(vidID);
-
-  Session.set("totalTime", player.getDuration() );
-
-  // set periodic updates
-  setInterval(updatePlayerInfo, 250);
-};
-
-
-var getYoutubeID = function(vidURL) {
-  var idRegex = /(v=)(\w*)/;
-  idMatch = vidURL.match(idRegex);
-  return idMatch ? idMatch[2] : "";
-};
-
-
-var updatePlayerInfo = function() {
-  if(ytplayer) {
-    Session.set( "volume", volFromYT(ytplayer.getVolume()) );
-    Session.set( "curTime", Math.ceil(ytplayer.getCurrentTime()) );
-  }  
-};
-
-
-var onPlayerStateChange = function(event) {
-  var newState = event.data;
-  var player = event.target;
-  var state = YT.PlayerState;
-
-  if (newState === state.PLAYING) {
-    // make sure video volume matches our control volume
-    player.setVolume( volToYT(Session.get("volume")) );
-    Session.set("playing", true);
-  } else if ((newState === state.PAUSED) || (newState === state.ENDED)) {
-    Session.set("playing", false);
-  }
-};
-
-
-var volToYT = function(volume) {
-  // set a volume value on the YouTube player so that its volume slider control
-  // looks like our volume slider control
-
-  var YTvolume;
-  if (Session.get("hasFlash")) {
-    YTvolume = Math.round( Math.pow((0.1029010817 * volume), 1.9802909245) );
-    if (YTvolume > 100) YTvolume = 100;
-  } else {
-    YTvolume = volume;
-  }
-  return YTvolume;
-};
-
-
-var volFromYT = function(YTvolume) {
-  // return a volume value that reflects the position of the volume slider 
-  // control on the embedded YouTube video player.
-
-  var volume;
-  if (Session.get("hasFlash")) {
-    volume = Math.round( 9.7180708287 * Math.pow(YTvolume, 0.5049763081) );
-    if (volume > 100) volume = 100;
-  } else {
-    volume = Math.round(YTvolume);
-  }
-  return volume;
-};
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Page template
-
-
-Template.page.instructions = function () {
-  return "Use the controls below.";
-};
+  Session.set("YtAPIready", true);
+}; 
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -134,6 +138,19 @@ Template.page.instructions = function () {
 
 Template.header.playlistName = function() {
   return Session.get("listName");
+};
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Tracks template
+
+Template.tracks.itemsLoaded = function() {
+  return Session.get("itemsLoaded");
+};
+
+
+Template.tracks.items = function() {
+  return Items.find({},{sort: {seqNo: 1}});
 };
 
 
@@ -153,7 +170,7 @@ Template.controls.playOrPause = function() {
 
 
 Template.controls.volValue = function() {
-  return Session.get("volume");
+  return Math.round(Session.get("volume"));
 };
 
 
@@ -206,11 +223,11 @@ Template.controls.events({
   // the Youtube player
 
   'click input.playback' : function () {
-    if ( ytplayer && Session.get("playing") ) {
-      ytplayer.pauseVideo();
+    if ( curPlayer && Session.get("playing") ) {
+      curPlayer.pause();
       Session.set("playing", false);
-    } else if (ytplayer) {
-      ytplayer.playVideo();
+    } else if (curPlayer) {
+      curPlayer.play();
       Session.set("playing", true);
     }
   },
@@ -220,7 +237,7 @@ Template.controls.events({
     var volume = Session.get("volume") - 5;
     if (volume < 0) volume = 0;
     Session.set("volume", volume);
-    if (ytplayer) ytplayer.setVolume( volToYT(volume) );
+    if (curPlayer) curPlayer.setVolume(volume);
   },
 
 
@@ -228,16 +245,16 @@ Template.controls.events({
     var volume = Session.get("volume") + 5;
     if (volume > 100) volume = 100;
     Session.set("volume", volume);
-    if (ytplayer) ytplayer.setVolume( volToYT(volume) );
+    if (curPlayer) curPlayer.setVolume(volume);
   },
 
 
   'click input.muteCtrl' : function() {
-    if ( ytplayer && Session.get("mute") ) {
-      ytplayer.unMute();
+    if ( curPlayer && Session.get("mute") ) {
+      curPlayer.unMute();
       Session.set("mute", false);
-    } else if (ytplayer) {
-      ytplayer.mute();
+    } else if (curPlayer) {
+      curPlayer.mute();
       Session.set("mute", true);
     }
   },
@@ -248,7 +265,7 @@ Template.controls.events({
     var newTime = Session.get("curTime") - step;
     if (newTime < 0) newTime = 0;
     // Session.set("curTime", newTime);   <- FUTURE USE, maybe
-    ytplayer.seekTo(newTime, true);
+    curPlayer.setNewTime(newTime);
   },
 
 
@@ -258,7 +275,7 @@ Template.controls.events({
     var newTime = Session.get("curTime") + step;
     if (newTime > totalTime) newTime = totalTime;
     // Session.set("curTime", newTime);   <- FUTURE USE, maybe
-    ytplayer.seekTo(newTime, true);
+    curPlayer.setNewTime(newTime);
   }
 });
 
@@ -270,6 +287,7 @@ Template.controls.events({
 Meteor.startup(function () {
   
   // load the YouTube IFrame Player API code asynchronously
+  Session.set("YtAPIready", false);
   loadYTplayerAPI();
 
 

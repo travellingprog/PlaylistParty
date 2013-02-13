@@ -25,5 +25,5 @@ Meteor.publish("playlist", function (playlistID) {
 
 // return only the items for the playlist specified, sorted by sequence number
 Meteor.publish("items", function(playlistID) {
-  return Items.find({"playlistID" : playlistID}, {sort: {seqNo: 1}});
+  return Items.find({"playlistID" : playlistID});
 });
