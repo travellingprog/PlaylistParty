@@ -11,6 +11,76 @@ var YtPlayer = function(id, streamID) {
   });
 
 
+  this.play = function () {
+    ytplayer.playVideo();
+  }
+  
+  this.pause = function () {
+    ytplayer.pauseVideo();
+  }
+  
+  this.setVolume = function (newVolume) {
+    ytplayer.setVolume(newVolume);
+  }
+
+  this.getVolume = function () {
+    return ytplayer.getVolume();
+  }
+
+  this.mute = function () {
+    ytplayer.mute();
+  }
+
+  this.unMute = function () {
+    ytplayer.unMute();
+  }
+  
+  this.setNewTime = function (newTime) {
+    ytplayer.seekTo(newTime, true);
+  }
+
+  this.getCurrentTime = function() {
+    return Math.ceil(ytplayer.getCurrentTime());
+  }
+
+  this.getDuration = function() {
+    return Math.floor(ytplayer.getDuration());
+  }
+};
+
+
+// Called by any Youtube player when it is ready
+var onPlayerReady = function(event) {
+  // cue video
+  var id = event.target.getIframe().getAttribute("id");
+  var thisPlayer = player[id];
+  thisPlayer.setVolume(Session.get("volume"));
+};
+
+
+// Called by any Youtube player when it changes state
+var onPlayerStateChange = function(event) {
+  var newState = event.data;
+  var state = YT.PlayerState;
+  var id = event.target.getIframe().getAttribute("id");
+
+  if (newState === state.PLAYING) {
+    // make sure video volume matches our control volume
+    player[id].setVolume(Session.get("volume"));
+    curPlayer = player[id];    
+    Session.set("playing", true);
+    return;
+  }
+
+  if (curPlayer !== player[id]) return;
+
+  if ((newState === state.PAUSED) || (newState === state.ENDED)) {
+    Session.set("playing", false);
+  }
+};
+
+
+
   // function volumeToYT(volume) {
   //   // set a volume value on the YouTube player so that its volume slider 
   //   // control looks like our volume slider control
@@ -39,75 +109,3 @@ var YtPlayer = function(id, streamID) {
   //   }
   //   return volume;
   // }
-
-
-  this.play = function () {
-    ytplayer.playVideo();
-  }
-  
-  this.pause = function () {
-    ytplayer.pauseVideo();
-  }
-  
-  this.setVolume = function (newVolume) {
-    // ytplayer.setVolume(volumeToYT(newVolume));  <- set control width instead
-    ytplayer.setVolume(newVolume);
-  }
-
-  this.getVolume = function () {
-    // return volFromYT(ytplayer.getVolume()); <- set our control width instead
-    return ytplayer.getVolume();
-  }
-
-  this.mute = function () {
-    ytplayer.mute();
-  }
-
-  this.unMute = function () {
-    ytplayer.unMute();
-  }
-  
-  this.setNewTime = function (newTime) {
-    ytplayer.seekTo(newTime, true);
-  }
-
-  this.getCurrentTime = function() {
-    return Math.ceil(ytplayer.getCurrentTime());
-  }
-
-  this.getDuration = function() {
-    return ytplayer.getDuration();
-  }
-};
-
-
-// Called by any Youtube player when it is ready
-var onPlayerReady = function(event) {
-  // cue video
-  player = event.target;
-  vidID = getYoutubeID(player.getVideoUrl());
-  if (! vidID === "") player.cueVideoById(vidID);
-};
-
-
-var getYoutubeID = function(vidURL) {
-  var idRegex = /(v=)(\w*)/;
-  idMatch = vidURL.match(idRegex);
-  return idMatch ? idMatch[2] : "";
-};
-
-
-// Called by any Youtube player when it changes state
-var onPlayerStateChange = function(event) {
-  var newState = event.data;
-  var player = event.target;
-  var state = YT.PlayerState;
-
-  if (newState === state.PLAYING) {
-    // make sure video volume matches our control volume
-    player.setVolume(Session.get("volume"));
-    Session.set("playing", true);
-  } else if ((newState === state.PAUSED) || (newState === state.ENDED)) {
-    Session.set("playing", false);
-  }
-};

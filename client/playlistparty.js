@@ -97,8 +97,8 @@ Meteor.autorun(itemsObservation);
 
 // set periodic updates
 var updatePlayerInfo = function() {
-  if(curPlayer) {
-    Session.set("volume", curPlayer.getVolume() );
+  if (curPlayer) {
+    Session.set("volume", curPlayer.getVolume());
     Session.set("curTime", curPlayer.getCurrentTime());
     Session.set("totalTime", curPlayer.getDuration());
   }  
