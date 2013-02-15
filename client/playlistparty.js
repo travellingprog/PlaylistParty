@@ -10,9 +10,7 @@ Meteor.subscribe("playlist", testList, function() {
 
 
 Session.set("itemsLoaded", false);
-Meteor.subscribe("items", testList, function() {
-    Session.set("itemsLoaded", true);
-});
+Meteor.subscribe("items", testList); 
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -76,25 +74,6 @@ var createPlayer = function(item) {
 };
 
 
-// set items observation
-var items, itemHandle;
-var itemsObservation = function(handle) {
-  // Don't observe items until the YouTube API is ready
-  if (! Session.equals("YtAPIready", true)) return;
-  if (! Session.equals("itemsLoaded", true)) return;
-
-  // disable Meteor.autorun() if you get here
-  handle.stop();  
-
-  items = Items.find({},{sort: {seqNo: 1}});
-  itemHandle = items.observe({
-    added: createPlayer
-  });
-};
-
-Meteor.autorun(itemsObservation);
-
-
 // set periodic updates
 var updatePlayerInfo = function() {
   if (curPlayer) {
@@ -144,13 +123,24 @@ Template.header.playlistName = function() {
 ///////////////////////////////////////////////////////////////////////////////
 // Tracks template
 
-Template.tracks.itemsLoaded = function() {
-  return Session.get("itemsLoaded");
-};
+
+Template.tracks.APIsReady = function () {
+  if (! Session.get("YtAPIready")) return false;
+  return true;
+}
 
 
 Template.tracks.items = function() {
   return Items.find({},{sort: {seqNo: 1}});
+};
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Player template
+
+Template.player.rendered = function() {
+  // alert(this.data._id);
+  createPlayer(this.data);
 };
 
 
@@ -300,4 +290,3 @@ Meteor.startup(function () {
   }
 
 });
-

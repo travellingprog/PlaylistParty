@@ -10,8 +10,8 @@
 
 <template name="page">
   {{> header}}
-  {{> tracks}}
   {{> controls}}
+  {{> tracks}}
 </template>
 
 <template name="header">
@@ -21,7 +21,7 @@
 
 
 <template name="tracks">
-  {{#if itemsLoaded}}
+  {{#if APIsReady}}
   {{#each items}}
     {{> player}}
   {{/each}}
