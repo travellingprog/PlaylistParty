@@ -89,6 +89,7 @@ setInterval(updatePlayerInfo, 250);
 
 // set the current player
 var setCurPlayer = function(curPlayerID) {
+  if (curPlayer !== undefined) curPlayer.pause();
   curPlayer = player[curPlayerID];
   Session.set("current_player", curPlayerID);
   player[curPlayerID].setVolume(Session.get("volume"));
@@ -123,7 +124,6 @@ var onYouTubeIframeAPIReady = function () {
 ///////////////////////////////////////////////////////////////////////////////
 // Header template
 
-
 Template.header.playlistName = function() {
   return Session.get("listName");
 };
@@ -131,7 +131,6 @@ Template.header.playlistName = function() {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Tracks template
-
 
 Template.tracks.APIsReady = function () {
   if (! Session.get("YtAPIready")) return false;
@@ -311,7 +310,6 @@ Template.controls.events({
 
 ///////////////////////////////////////////////////////////////////////////////
 // Code to run on the client as soon as the DOM is ready
-
 
 Meteor.startup(function () {
   
