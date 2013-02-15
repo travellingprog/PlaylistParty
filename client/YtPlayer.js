@@ -10,7 +10,6 @@ var YtPlayer = function(id, streamID) {
     }
   });
 
-
   this.play = function () {
     ytplayer.playVideo();
   }
@@ -65,9 +64,7 @@ var onPlayerStateChange = function(event) {
   var id = event.target.getIframe().getAttribute("id");
 
   if (newState === state.PLAYING) {
-    // make sure video volume matches our control volume
-    player[id].setVolume(Session.get("volume"));
-    curPlayer = player[id];    
+    if (curPlayer !== player[id]) setCurPlayer(id);
     Session.set("playing", true);
     return;
   }

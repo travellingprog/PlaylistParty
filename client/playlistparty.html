@@ -10,8 +10,8 @@
 
 <template name="page">
   {{> header}}
-  {{> controls}}
   {{> tracks}}
+  {{> controls}}
 </template>
 
 <template name="header">
@@ -30,7 +30,7 @@
 
 
 <template name="player">
-  <div class="playerItem">
+  <div class="playerItem {{isCurrent}}">
     {{#constant}}
     <div id="{{_id}}"></div>
     {{/constant}}
@@ -51,6 +51,11 @@
       <legend>Time: ({{curTime}}/{{totalTime}})</legend>
       <input type="button" class="decTime" value="<<" />
       <input type="button" class="incTime" value=">>" />
+    </fieldset>
+    <fieldset class="tracksControl">
+      <legend>Tracks</legend>
+      <input type="button" class="prevTrack" value="|<<" />
+      <input type="button" class="nextTrack" value=">>|" />
     </fieldset>
   </div>
 </template>

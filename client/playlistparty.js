@@ -19,7 +19,9 @@ Meteor.subscribe("items", testList);
 var player = Object();
 var curPlayer;
 
-var Player = function(embedPlayer, userID) {
+var Player = function(embedPlayer, userID, id) {
+
+  this.id = id;
 
   this.addedBy = function(user){
     return (user === userID);
@@ -64,13 +66,12 @@ var Player = function(embedPlayer, userID) {
 
 
 var createPlayer = function(item) {
-
   if (item.type === "YouTube") {
     player[item._id] = new Player(new YtPlayer(item._id, item.streamID), 
-                                  item.addedBy);
+                                  item.addedBy, item._id);
   }
 
-  if ((! curPlayer) && (item.seqNo === 1)) curPlayer = player[item._id];
+  if ((! curPlayer) && (item.seqNo === 1)) setCurPlayer(item._id);
 };
 
 
@@ -84,6 +85,14 @@ var updatePlayerInfo = function() {
 };
 
 setInterval(updatePlayerInfo, 250);
+
+
+// set the current player
+var setCurPlayer = function(curPlayerID) {
+  curPlayer = player[curPlayerID];
+  Session.set("current_player", curPlayerID);
+  player[curPlayerID].setVolume(Session.get("volume"));
+};
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -138,9 +147,12 @@ Template.tracks.items = function() {
 ///////////////////////////////////////////////////////////////////////////////
 // Player template
 
+Template.player.isCurrent = function () {
+  return Session.equals("current_player", this._id) ? "current" : '';
+};
+
 Template.player.rendered = function() {
-  // alert(this.data._id);
-  createPlayer(this.data);
+  if (player[this.data._id] === undefined) createPlayer(this.data);
 };
 
 
@@ -266,6 +278,33 @@ Template.controls.events({
     if (newTime > totalTime) newTime = totalTime;
     // Session.set("curTime", newTime);   <- FUTURE USE, maybe
     curPlayer.setNewTime(newTime);
+  },
+
+
+  'click input.prevTrack' : function() {
+    var curItem = Items.findOne({"_id" : curPlayer.id});
+    var prevItem = Items.findOne({seqNo: {$lt: curItem.seqNo}}, 
+                                 {sort: {seqNo: -1}});
+    if (prevItem) {
+      setCurPlayer(prevItem._id);
+    } else {
+      prevItem = Items.findOne({}, {sort: {seqNo: -1}});
+      setCurPlayer(prevItem._id);
+    }
+  },
+
+
+  'click input.nextTrack' : function() {
+    var curItem = Items.findOne({"_id" : curPlayer.id});
+    var nextItem = Items.findOne({seqNo: {$gt: curItem.seqNo}}, 
+                                 {sort: {seqNo: 1}});
+
+    if (nextItem) {
+      setCurPlayer(nextItem._id);
+    } else {
+      nextItem = Items.findOne({}, {sort: {seqNo: 1}});
+      setCurPlayer(nextItem._id);
+    }
   }
 });
 

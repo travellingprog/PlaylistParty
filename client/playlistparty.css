@@ -1,4 +1,12 @@
-/* CSS declarations go here */
-.volControl, .timeControl {
+fieldset {
   display: inline;
+}
+
+.playerItem {
+  padding: 5px;
+  margin: 20px;
+}
+
+.current {
+  border: 3px dotted blue;
 }
