@@ -10,3 +10,11 @@ fieldset {
 .current {
   border: 3px dotted blue;
 }
+
+.urlControl {
+  margin-top: 15px;
+}
+
+#urlText {
+  width: 300px;
+}

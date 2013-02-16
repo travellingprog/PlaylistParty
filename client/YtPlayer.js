@@ -77,6 +77,13 @@ var onPlayerStateChange = function(event) {
 };
 
 
+var getYoutubeID = function(vidURL) {
+  var idRegex = /(v=)(\w*)/;
+  idMatch = vidURL.match(idRegex);
+  return idMatch ? idMatch[2] : "";
+};
+
+
 
   // function volumeToYT(volume) {
   //   // set a volume value on the YouTube player so that its volume slider 

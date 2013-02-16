@@ -304,6 +304,23 @@ Template.controls.events({
       nextItem = Items.findOne({}, {sort: {seqNo: 1}});
       setCurPlayer(nextItem._id);
     }
+  },
+
+
+  'click input.addURL' : function () {
+    var url = $('#urlText').val();
+    $('#urlText').val('');
+
+    //if isYoutube(url) {
+    var mediaID = getYoutubeID(url);
+    Items.insert({
+      "playlistID" : testList, 
+      "type" : "YouTube", 
+      "streamID" : mediaID, 
+      "seqNo" : (new Date()).getTime(), 
+      "addedBy" : "user1"
+    });
+    //}
   }
 });
 
@@ -313,6 +330,8 @@ Template.controls.events({
 
 Meteor.startup(function () {
   
+  // past time: 1360973277020
+
   // load the YouTube IFrame Player API code asynchronously
   Session.set("YtAPIready", false);
   loadYTplayerAPI();
