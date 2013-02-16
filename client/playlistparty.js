@@ -85,10 +85,30 @@ setInterval(updatePlayerInfo, 250);
 
 // set the current player
 var setCurPlayer = function(curPlayerID) {
-  if (curPlayer !== undefined) curPlayer.pause();
+  
+  // if currently playing, pause until we switch the player
+  var continuePlaying = Session.get("playing");
+  if (continuePlaying) curPlayer.pause();
+
+  player[curPlayerID].setVolume(Session.get("volume"));
   curPlayer = player[curPlayerID];
   Session.set("current_player", curPlayerID);
-  player[curPlayerID].setVolume(Session.get("volume"));
+
+  if (continuePlaying) curPlayer.play();  // may not work on mobile devices
+};
+
+
+var goToNextPlayer = function () {
+  var curItem = Items.findOne({"_id" : curPlayer.id});
+  var nextItem = Items.findOne({seqNo: {$gt: curItem.seqNo}}, 
+                               {sort: {seqNo: 1}});
+
+  if (nextItem) {
+    setCurPlayer(nextItem._id);
+  } else {
+    nextItem = Items.findOne({}, {sort: {seqNo: 1}});
+    setCurPlayer(nextItem._id);
+  }
 };
 
 
@@ -158,6 +178,18 @@ Template.player.rendered = function() {
 
 Template.player.events({
   'click input.remItem' : function () {
+    var thisID = this._id;
+    if (curPlayer === player[thisID]) {
+      if (Items.find({}).count() > 1) {
+        goToNextPlayer();
+        //note: going to next track will auto-pause the current one
+      } else {
+        curPlayer.pause();
+      }
+    }
+
+    delete player[thisID];
+
     Items.remove(this._id, function (error) {
       if (error !== undefined) alert(error);
     });
@@ -302,16 +334,7 @@ Template.controls.events({
 
 
   'click input.nextTrack' : function() {
-    var curItem = Items.findOne({"_id" : curPlayer.id});
-    var nextItem = Items.findOne({seqNo: {$gt: curItem.seqNo}}, 
-                                 {sort: {seqNo: 1}});
-
-    if (nextItem) {
-      setCurPlayer(nextItem._id);
-    } else {
-      nextItem = Items.findOne({}, {sort: {seqNo: 1}});
-      setCurPlayer(nextItem._id);
-    }
+    goToNextPlayer();
   },
 
 
@@ -321,11 +344,12 @@ Template.controls.events({
 
     //if isYoutube(url) {
     var mediaID = getYoutubeID(url);
+
     Items.insert({
       "playlistID" : testList, 
       "type" : "YouTube", 
       "streamID" : mediaID, 
-      "seqNo" : (new Date()).getTime(), 
+      "seqNo" : (Items.find({}).count() + 1) + "." + (new Date()).getTime(), 
       "addedBy" : "user1"
     });
     //}

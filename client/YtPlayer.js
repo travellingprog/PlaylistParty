@@ -19,7 +19,9 @@ var YtPlayer = function(id, streamID) {
   }
   
   this.setVolume = function (newVolume) {
-    ytplayer.setVolume(newVolume);
+    if (typeof ytplayer.setvolume === 'function') {
+      ytplayer.setVolume(newVolume);  
+    }
   }
 
   this.getVolume = function () {
@@ -71,8 +73,15 @@ var onPlayerStateChange = function(event) {
 
   if (curPlayer !== player[id]) return;
 
-  if ((newState === state.PAUSED) || (newState === state.ENDED)) {
+  if (newState === state.PAUSED) {
     Session.set("playing", false);
+  }
+
+  if (newState === state.ENDED) {
+    // because Pause state is called right before Ended...
+    Session.set("playing", true);
+    // ... then ...
+    goToNextPlayer();
   }
 };
 
