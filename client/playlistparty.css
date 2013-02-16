@@ -1,14 +1,62 @@
-fieldset {
-  display: inline;
+*{
+  margin: 0;
 }
+
+.header {
+  width: 100%;
+  position: fixed;
+  top: 0px;
+  z-index: 10;
+  color: LawnGreen;
+  background-color: Black;
+  margin: 0 auto 0 auto;
+  height: 85px;
+  text-align: center;
+  border-bottom: 6px double green;
+}
+
+.wrapper {
+  margin: 106px auto 0px;
+  padding-bottom: 110px;
+}
+
 
 .playerItem {
   padding: 5px;
   margin: 20px;
+  z-index: 1;
+  border: 2px dotted blue;
+}
+
+.playerItem>* {
+  display: block;
+  margin: 5px auto;
 }
 
 .current {
-  border: 3px dotted blue;
+  border: 3px solid blue;
+}
+
+fieldset {
+  display: inline;
+}
+
+
+#controlFooter {
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
+  z-index: 10;
+  color: LawnGreen;
+  background-color: Black;
+  border-top: 6px double green;
+  padding: 10px;
+}
+
+#controlBox {
+  display: block;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .urlControl {

@@ -15,17 +15,21 @@
 </template>
 
 <template name="header">
+<div class="header">
   <h1>Playlist Party!</h1>
   <h2>{{playlistName}}</h2>
+</div>
 </template>
 
 
 <template name="tracks">
+  <div class="wrapper">
   {{#if APIsReady}}
   {{#each items}}
     {{> player}}
   {{/each}}
   {{/if}}
+  </div>
 </template>
 
 
@@ -33,12 +37,17 @@
   <div class="playerItem {{isCurrent}}">
     {{#constant}}
     <div id="{{_id}}"></div>
+    {{#if myItem}}
+    <input type="button" class="remItem" value="remove" />
+    {{/if}}
     {{/constant}}
   </div>
 </template>
 
 
 <template name="controls">
+<div id="controlFooter">
+<div id="controlBox">
   <div>
     <input type="button" class="playback" value="{{playOrPause}}" />
     <fieldset class="volControl">
@@ -62,4 +71,6 @@
     <label>URL: <input type="text" id="urlText"></label>
     <input type="button" class="addURL" value="Add" />
   </div>
+</div>
+</div>
 </template>

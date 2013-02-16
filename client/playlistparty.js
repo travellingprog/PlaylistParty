@@ -1,13 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Meteor Collection subscription
 
-var testList = "7bd9497a-de64-4535-b63c-ae4c772491e1";
+var testList = "c3dfdf09-a554-4f25-a100-4283bfe81fea";
 
-
-Meteor.subscribe("playlist", testList, function() {
-  Session.set("listName", Playlist.findOne({}).name);
-});
-
+Meteor.subscribe("playlist", testList);
 
 Session.set("itemsLoaded", false);
 Meteor.subscribe("items", testList); 
@@ -71,7 +67,7 @@ var createPlayer = function(item) {
                                   item.addedBy, item._id);
   }
 
-  if ((! curPlayer) && (item.seqNo === 1)) setCurPlayer(item._id);
+  if (! curPlayer) setCurPlayer(item._id);
 };
 
 
@@ -125,7 +121,9 @@ var onYouTubeIframeAPIReady = function () {
 // Header template
 
 Template.header.playlistName = function() {
-  return Session.get("listName");
+  var thisList = Playlist.findOne(testList);
+  if (thisList === undefined) return "";
+  return thisList.name;
 };
 
 
@@ -150,9 +148,21 @@ Template.player.isCurrent = function () {
   return Session.equals("current_player", this._id) ? "current" : '';
 };
 
+Template.player.myItem = function () {
+  return (this.addedBy === "user1");
+};
+
 Template.player.rendered = function() {
   if (player[this.data._id] === undefined) createPlayer(this.data);
 };
+
+Template.player.events({
+  'click input.remItem' : function () {
+    Items.remove(this._id, function (error) {
+      if (error !== undefined) alert(error);
+    });
+  }
+});
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -220,8 +230,6 @@ var showTime = function(total) {
 
 
 Template.controls.events({
-  // in the future, the events below will NOT directly trigger methods on
-  // the Youtube player
 
   'click input.playback' : function () {
     if ( curPlayer && Session.get("playing") ) {

@@ -10,7 +10,7 @@ Meteor.startup(function () {
       "playlistID" : list,
       "type" : "YouTube",
       "streamID" : "V_QyvLX4h2k",
-      "seqNo": 1,
+      "seqNo": (new Date()).getTime(),
       "addedBy": "user1"      
     });
   }

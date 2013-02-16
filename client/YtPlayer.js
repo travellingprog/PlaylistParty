@@ -1,8 +1,8 @@
 var YtPlayer = function(id, streamID) {
 
   var ytplayer = new YT.Player(id, {
-    height: '390',
-    width: '640',
+    height: '240',
+    width: '320',
     videoId: streamID,
     events: {
       'onReady': onPlayerReady,
@@ -78,7 +78,7 @@ var onPlayerStateChange = function(event) {
 
 
 var getYoutubeID = function(vidURL) {
-  var idRegex = /(v=)(\w*)/;
+  var idRegex = /(v=)([\w-]*)/;
   idMatch = vidURL.match(idRegex);
   return idMatch ? idMatch[2] : "";
 };
