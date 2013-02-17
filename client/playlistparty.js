@@ -90,9 +90,15 @@ var setCurPlayer = function(curPlayerID) {
   var continuePlaying = Session.get("playing");
   if (continuePlaying) curPlayer.pause();
 
+  // set new curPlayer
   player[curPlayerID].setVolume(Session.get("volume"));
   curPlayer = player[curPlayerID];
   Session.set("current_player", curPlayerID);
+
+  // scroll to new curPlayer
+  firstPOffset = $('.playerItem :first').offset().top;
+  newOffset = $('#' + curPlayerID).offset().top - firstPOffset;
+  $('html, body').animate({scrollTop: newOffset}, 400);
 
   if (continuePlaying) curPlayer.play();  // may not work on mobile devices
 };
@@ -362,7 +368,7 @@ Template.controls.events({
 
 Meteor.startup(function () {
   
-  // past time: 1360973277020
+  window.scrollTo(0,0);
 
   // load the YouTube IFrame Player API code asynchronously
   Session.set("YtAPIready", false);

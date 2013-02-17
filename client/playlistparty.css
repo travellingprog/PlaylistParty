@@ -16,7 +16,8 @@
 }
 
 .wrapper {
-  margin: 106px auto 0px;
+  margin: 0px auto 0px;
+  padding-top: 106px;
   padding-bottom: 110px;
 }
 
