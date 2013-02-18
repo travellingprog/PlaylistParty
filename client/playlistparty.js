@@ -58,6 +58,10 @@ var Player = function(embedPlayer, userID, id) {
   this.updateDuration = function() {
     return embedPlayer.updateDuration();
   };
+
+  this.updateMuted = function () {
+    return embedPlayer.updateMuted();
+  }
 };
 
 
@@ -79,6 +83,7 @@ var updatePlayerInfo = function() {
   if (curPlayer) {
     curPlayer.updateVolume();
     curPlayer.updateCurrentTime();
+    curPlayer.updateMuted();
   }  
 };
 
@@ -214,6 +219,18 @@ Template.controls.curTime = function() {
 
 Template.controls.totalTime = function() {
   return showTime(Session.get("totalTime"));
+};
+
+
+Template.controls.curTrack = function() {
+  if (! curPlayer) return 0;
+  var curItem = Items.findOne({"_id" : curPlayer.id});
+  return Items.find({seqNo: {$lte: curItem.seqNo}}).count();
+};
+
+
+Template.controls.numTracks = function() {
+  return Items.find({}).count();
 };
 
 

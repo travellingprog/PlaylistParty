@@ -77,6 +77,10 @@ var YtPlayer = function(id, streamID) {
   this.updateDuration = function() {
     Session.set("totalTime", Math.floor(ytplayer.getDuration()) );
   }
+
+  this.updateMuted = function () {
+    Session.set("mute", ytplayer.isMuted());
+  }
 };
 
 

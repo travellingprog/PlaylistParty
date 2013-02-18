@@ -78,6 +78,11 @@ var ScPlayer = function(id, streamID) {
       Session.set("totalTime", Math.round(duration / 1000));
     });
   }
+
+  this.updateMuted = function () {
+    // NOTE: The SoundCloud widget does not offer any mute control... yet
+    return;
+  }
 }
 
 
