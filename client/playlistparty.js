@@ -35,8 +35,8 @@ var Player = function(embedPlayer, userID, id) {
     embedPlayer.setVolume(newVolume); 
   };
 
-  this.getVolume = function () { 
-    return embedPlayer.getVolume(); 
+  this.updateVolume = function () { 
+    return embedPlayer.updateVolume(); 
   };
 
   this.mute = function () {
@@ -51,12 +51,12 @@ var Player = function(embedPlayer, userID, id) {
     embedPlayer.setNewTime(newTime);
   }
 
-  this.getCurrentTime = function() {
-    return embedPlayer.getCurrentTime();
+  this.updateCurrentTime = function() {
+    return embedPlayer.updateCurrentTime();
   };
 
-  this.getDuration = function() {
-    return embedPlayer.getDuration();
+  this.updateDuration = function() {
+    return embedPlayer.updateDuration();
   };
 };
 
@@ -64,6 +64,9 @@ var Player = function(embedPlayer, userID, id) {
 var createPlayer = function(item) {
   if (item.type === "YouTube") {
     player[item._id] = new Player(new YtPlayer(item._id, item.streamID), 
+                                  item.addedBy, item._id);
+  } else if (item.type === "SoundCloud") {
+    player[item._id] = new Player(new ScPlayer(item._id, item.streamID), 
                                   item.addedBy, item._id);
   }
 
@@ -74,9 +77,8 @@ var createPlayer = function(item) {
 // set periodic updates
 var updatePlayerInfo = function() {
   if (curPlayer) {
-    Session.set("volume", curPlayer.getVolume());
-    Session.set("curTime", curPlayer.getCurrentTime());
-    Session.set("totalTime", curPlayer.getDuration());
+    curPlayer.updateVolume();
+    curPlayer.updateCurrentTime();
   }  
 };
 
@@ -100,6 +102,7 @@ var setCurPlayer = function(curPlayerID) {
   newOffset = $('#' + curPlayerID).offset().top - firstPOffset;
   $('html, body').animate({scrollTop: newOffset}, 400);
 
+  curPlayer.updateDuration();
   if (continuePlaying) curPlayer.play();  // may not work on mobile devices
 };
 
@@ -119,31 +122,6 @@ var goToNextPlayer = function () {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// YouTube API code
-
-// load the YouTube IFrame Player API code
-var loadYTplayerAPI = function () {
-
-  var ytPlayerScript = 
-                  '<script src="https://www.youtube.com/iframe_api"></script>';
-
-  // place the Player API <script> as the first script on the page
-  var oldfirstScript = $('script :first');
-  if (oldfirstScript.length) {
-    oldfirstScript.before(ytPlayerScript);
-  } else {
-    $('head').append(ytPlayerScript);
-  }
-};
-
-
-// Signal when the Youtube API is ready, to load the YouTube player
-var onYouTubeIframeAPIReady = function () {
-  Session.set("YtAPIready", true);
-}; 
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Header template
 
 Template.header.playlistName = function() {
@@ -158,6 +136,7 @@ Template.header.playlistName = function() {
 
 Template.tracks.APIsReady = function () {
   if (! Session.get("YtAPIready")) return false;
+  if (! Session.get("ScAPIready")) return false;
   return true;
 }
 
@@ -347,20 +326,26 @@ Template.controls.events({
   'click input.addURL' : function () {
     var url = $('#urlText').val();
     $('#urlText').val('');
+    var mediaID, type;
 
-    //if isYoutube(url) {
-    var mediaID = getYoutubeID(url);
+    if (url.search("youtube") !== -1) {
+      mediaID = getYoutubeID(url);
+      type = "YouTube";
+    } else if (url.search("soundcloud") !== -1) {
+      mediaID = url;
+      type = "SoundCloud";
+    }
 
     Items.insert({
       "playlistID" : testList, 
-      "type" : "YouTube", 
+      "type" : type, 
       "streamID" : mediaID, 
       "seqNo" : (Items.find({}).count() + 1) + "." + (new Date()).getTime(), 
       "addedBy" : "user1"
     });
-    //}
   }
 });
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -373,6 +358,12 @@ Meteor.startup(function () {
   // load the YouTube IFrame Player API code asynchronously
   Session.set("YtAPIready", false);
   loadYTplayerAPI();
+
+  // Register with the SoundCloud API
+  SC.initialize({
+    client_id: '46952284e7dd10b148d9868c4ad74cdc'
+  });
+  Session.set("ScAPIready", true);
 
 
   // Flash detection

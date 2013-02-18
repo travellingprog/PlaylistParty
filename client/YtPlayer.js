@@ -1,3 +1,33 @@
+///////////////////////////////////////////////////////////////////////////////
+// YouTube API loading
+
+// load the YouTube IFrame Player API code
+var loadYTplayerAPI = function () {
+
+  var ytPlayerScript = 
+                  '<script src="https://www.youtube.com/iframe_api"></script>';
+
+  // place the Player API <script> as the first script on the page
+  var oldfirstScript = $('script :first');
+  if (oldfirstScript.length) {
+    oldfirstScript.before(ytPlayerScript);
+  } else {
+    $('head').append(ytPlayerScript);
+  }
+};
+
+
+// Signal when the Youtube API is ready, to load the YouTube player
+var onYouTubeIframeAPIReady = function () {
+  Session.set("YtAPIready", true);
+}; 
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// YouTube Player object
+
+
 var YtPlayer = function(id, streamID) {
 
   var ytplayer = new YT.Player(id, {
@@ -24,8 +54,8 @@ var YtPlayer = function(id, streamID) {
     }
   }
 
-  this.getVolume = function () {
-    return ytplayer.getVolume();
+  this.updateVolume = function () {
+    Session.set("volume", ytplayer.getVolume());
   }
 
   this.mute = function () {
@@ -40,12 +70,12 @@ var YtPlayer = function(id, streamID) {
     ytplayer.seekTo(newTime, true);
   }
 
-  this.getCurrentTime = function() {
-    return Math.ceil(ytplayer.getCurrentTime());
+  this.updateCurrentTime = function() {
+    Session.set("curTime", Math.ceil(ytplayer.getCurrentTime()) );
   }
 
-  this.getDuration = function() {
-    return Math.floor(ytplayer.getDuration());
+  this.updateDuration = function() {
+    Session.set("totalTime", Math.floor(ytplayer.getDuration()) );
   }
 };
 
@@ -84,6 +114,11 @@ var onPlayerStateChange = function(event) {
     goToNextPlayer();
   }
 };
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// YouTube utility functions
 
 
 var getYoutubeID = function(vidURL) {
