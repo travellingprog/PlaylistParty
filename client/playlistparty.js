@@ -131,8 +131,15 @@ var goToNextPlayer = function () {
 
 Template.header.playlistName = function() {
   var thisList = Playlist.findOne(testList);
-  if (thisList === undefined) return "";
+  if (thisList === undefined) return "Welcome";
   return thisList.name;
+};
+
+Template.header.rendered = function() {
+  // var newHeight = $('#header').css("height");
+  // $('.headSection').css("height", newHeight);
+  // var searchHeight = $('.form-search').css("height");
+  // $('.form-search').css("margin-top", "" + newHeight - searchHeight);
 };
 
 
@@ -224,7 +231,7 @@ Template.controls.totalTime = function() {
 
 Template.controls.curTrack = function() {
   if (! curPlayer) return 0;
-  var curItem = Items.findOne({"_id" : curPlayer.id});
+  var curItem = Items.findOne(Session.get("current_player"));
   return Items.find({seqNo: {$lte: curItem.seqNo}}).count();
 };
 
@@ -359,6 +366,44 @@ Template.controls.events({
       "streamID" : mediaID, 
       "seqNo" : (Items.find({}).count() + 1) + "." + (new Date()).getTime(), 
       "addedBy" : "user1"
+    });
+  },
+
+
+  'click input.ytSearch' : function () {
+    var searchURL = "https://www.googleapis.com/youtube/v3/search";
+    var param = Object();
+    param["q"] = "Eminem Kill You";
+    param["type"] = "video";
+    param["key"] = "AIzaSyC9NItPbDx4SdF3DQJn-5dT2fL1qtNACKI";
+    param["videoEmbeddable"] = true;
+    param["maxResults"] = 9;
+    param["part"] = "id, snippet";
+    param["fields"] =  "etag, nextPageToken, prevPageToken, items(id/videoId, ";
+    param["fields"] += "snippet(title, thumbnails/default/url))";
+
+    Meteor.http.get(searchURL, {params: param}, function (error, result)  {
+      var vidResults = result.data;
+      alert(vidResults.items[0].snippet.thumbnails.default.url);
+    });
+  },
+
+
+  'click input.scSearch' : function () {
+    var param = Object();
+    param["q"] = "Mad Decent";
+    param["order"] = "hotness";
+    param["filter"] = "public, streamable";
+
+    SC.get('/tracks', param, function(tracks) {
+      var resString = "Number of results: " + tracks.length + "\n";
+      resString += "\n";
+      resString += "First track title: " + tracks[0].title + "\n";
+      resString += "Posted by: " + tracks[0].user.username + "\n";
+      resString += "artwork: " + tracks[0].artwork_url + "\n";
+      resString += "url: " + tracks[0].permalink_url + "\n";
+
+      alert(resString);
     });
   }
 });

@@ -1,6 +1,80 @@
+#header {
+  width: 100%;
+  background-color: #fe1237;
+  position: fixed;
+  left: 0px;
+  right: 0px;
+}
+
+#logoLarge {
+  margin: 10px auto 10px auto;
+  max-width: 200px;
+}
+
+#logoSmall {
+  margin: 5px auto 5px auto;
+  max-width: 50px;
+}
+
+
+.playlistName {
+  text-align: center;
+  color: white;
+  font-family: Haettenschweiler, Impact, fantasy;
+  font-style: italic;
+}
+
+.btn-toolbar {
+  text-align: center;
+}
+
+.btn-success {
+  font-weight: bold;
+}
+
+
+.right {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+}
+
+
+.small {
+  display: none;
+}
+
+@media (max-width: 767px) {
+
+  .third {
+    float: left !important;
+    width: 33% !important;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .medium {
+    display: none !important;
+  }
+
+  .small {
+    display: block;
+  }
+
+  .right .btn {
+    position: relative;
+    left: 33%;
+  }
+}
+
+
+/*
 *{
   margin: 0;
 }
+
+
 
 .header {
   width: 100%;
@@ -66,4 +140,5 @@ fieldset {
 
 #urlText {
   width: 300px;
-}
+}*/
+

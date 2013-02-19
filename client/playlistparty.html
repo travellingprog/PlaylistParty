@@ -7,16 +7,116 @@
 </head>
 
 <body>
+  <!-- <div class="container"> -->
   {{> page}}
+  <!-- </div> -->
 </body>
 
 <template name="page">
+  {{> header}} 
+</template>
+
+
+<template name="header">
+  <div id="header">
+  <div class="row-fluid" style="position: relative">
+    
+    <!-- Left -->
+    <div class="span3 third">
+      <div class="hidden-phone">
+        <div id="logoLarge">
+          <img src="/LargeLogo.png" width="200" height="78" alt="logo">
+        </div>
+      </div>
+      
+      <div class="visible-phone">
+        <div class="btn-group" style="margin: 15px auto auto 5px">
+          <a class="btn dropdown-toggle btn-primary" data-toggle="dropdown" href="#">
+          <span class="caret"></span> Menu
+          </a>
+          <ul class="dropdown-menu">
+            <li class="disabled"><a href="#"><i class="icon-th-large"></i> Grid View </a></li>            
+            <li><a href="#"><i class="icon-th-list"></i> List View </a></li>
+            <li><a href="#"><i class="icon-cog"></i> Settings </a></li>          
+            <li class="small"><a href="#"><span class="label label-success">
+                <i class="icon-share-alt icon-white"></i> Share
+                </span></a></li>
+          </ul>
+        </div>
+        <!-- landscape phone only: -->
+        <button type="button" class="medium btn btn-success" style="margin-top: 15px">Share</button>
+      </div>
+    </div>
+
+
+    <!-- Middle -->
+    <div class="span6 third">
+      <div class="hidden-phone">
+        <h3 class="playlistName">{{playlistName}}</h3>
+        <div class="row-fluid">
+          <div class="btn-toolbar span12">
+            <div class="btn-group" data-toggle="buttons-radio">
+              <button type="button" class="btn btn-primary active">
+                <i class="icon-th-large icon-white"></i> Grid View 
+              </button>
+              <button type="button" class="btn btn-primary">
+                <i class="icon-th-list"></i> List View
+              </button>
+              <button type="button" class="btn btn-primary">
+                <i class="icon-cog"></i> Settings
+              </button>
+            </div>
+            <button type="button" class="btn btn-success">Share</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="visible-phone">
+        <div id="logoSmall">
+          <img src="/SmallLogo2.png" width="100" height="100" alt="logo">
+        </div>
+      </div>      
+    </div>
+
+
+    <!-- Right -->
+    <div class="span3 third right">
+      <div class="hidden-phone">
+        <div class="input-append" style="bottom: 10px; right: 5px">
+          <input type="text" class="span10" placeholder="Search...">
+          <button type="button" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
+        </div>
+      </div>
+      
+      <div class="visible-phone">
+        <!-- landscape phone -->
+        <div class="medium input-append input-small" style="bottom: 10px; right: 5px; width: 70%">
+          <input type="text" class="span4" placeholder="Search...">
+          <button type="button" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
+        </div>
+        <!-- portrait phone -->
+        <button type="button" class="small btn btn-primary btn-large text-right" style="margin-bottom: 10px">
+          <i class="icon-search icon-white"></i>
+        </button>
+      </div>
+    </div>
+  
+  </div>
+
+
+  </div>
+  </div>
+</template>
+
+
+
+<template name="pageOld">
   {{> header}}
   {{> tracks}}
   {{> controls}}
 </template>
 
-<template name="header">
+<template name="headerOld">
 <div class="header">
   <h1>Playlist Party!</h1>
   <h2>{{playlistName}}</h2>
@@ -24,7 +124,7 @@
 </template>
 
 
-<template name="tracks">
+<template name="tracksOld">
   <div class="wrapper">
   {{#if APIsReady}}
   {{#each items}}
@@ -35,7 +135,7 @@
 </template>
 
 
-<template name="player">
+<template name="playerOld">
   <div class="playerItem {{isCurrent}}">
     {{#constant}}
     <div id="{{_id}}"></div>
@@ -47,7 +147,7 @@
 </template>
 
 
-<template name="controls">
+<template name="controlsOld">
 <div id="controlFooter">
 <div id="controlBox">
   <div>
@@ -72,6 +172,8 @@
   <div class="urlControl">
     <label>URL: <input type="text" id="urlText"></label>
     <input type="button" class="addURL" value="Add" />
+    <input type="button" class="ytSearch" value="YT Search" />
+    <input type="button" class="scSearch" value="SC Search" />
   </div>
 </div>
 </div>
