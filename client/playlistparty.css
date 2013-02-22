@@ -1,4 +1,158 @@
+/* All Devices */
+
 #header {
+  width: 100%;
+  background-color: #fe1237;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  max-height: 84px;
+}
+
+  #header .left {
+    float: left;  /* 192 pixels minimum */
+    width: 25%;
+  }
+
+  #header .middle {
+    float: left;  /* 384 pixels minimum */
+    width: 50%;
+    max-height: 84px;   
+  }
+
+    .playlistName {
+      text-align: center;
+      color: white;
+      font-family: Haettenschweiler, Impact, fantasy;
+      height: 50%;
+      /*font-style: italic;*/
+    }
+
+      .playlistName h3 {
+        margin-top: 0px;
+        margin-bottom: 0px;
+        /*margin-top: 5px;*/
+      }
+
+    .deskMenu {
+      text-align: center;
+      margin-top: 0px;
+      height: 50%;
+    }
+
+  #header .right {
+    float: left;  /* 192 pixels minimum */
+    width: 25%; 
+  }
+
+
+  #header .logo img{
+    /* large logo: 190 x 74 */
+    /* small logo:  50 x 50 */
+    vertical-align: middle;
+    display: block;
+    margin: 5px auto 5px auto;
+  }
+
+
+/* Tablet and Desktop Only */
+@media (min-width: 768px) {
+
+    #header .form-search {
+      position: absolute;
+      bottom: 0;
+      margin-bottom: 0.75em;
+    }
+
+    #header .form-search .search-query {
+      width: 61% !important;
+    }
+
+}
+
+
+
+/* Landscape Phone And Portrait Phone */
+@media (max-width: 767px) {
+
+  #header .left {
+    width: 33% !important;
+  }
+
+  #header .middle {
+    width: 34% !important;  
+  }
+
+  #header .right {
+    width: 33% !important;  
+  }
+
+  #header .logo img{
+    margin: 3px auto 3px auto !important;
+  }
+
+
+  .visible-phone.phoneMenu {
+    padding-top: 0.75em;
+    padding-left: 0.75em;
+  }
+
+}
+
+
+/* Landscape Phone only */
+@media (min-width: 481px) and (max-width: 767px) {
+
+  /* all columns: 160 pixels minimum */
+
+  .lsPhone {
+    display: block;
+  }
+
+    .lsPhone.btn {
+      display: inline-block !important;
+    }
+
+  #header .form-search {
+    position: absolute;
+    padding-top: 0.75em;
+    padding-right: 0.75em;
+  }
+
+  #header .form-search .search-query {
+    width: 56% !important;
+  }
+
+  .porPhone {
+    display: none !important;
+  }
+}
+
+
+/* Portrait Phone only */
+@media (max-width: 480px) {
+
+  /* all columns: 160 pixels MAXimum */
+
+  .lsPhone {
+    display: none !important;
+  }
+
+  .porPhone {
+    display: block;
+  }
+
+    .porPhone.porPhoneSearch {
+      position: absolute;
+      top: 0.75em;
+      right: 0.75em;
+    }
+
+}
+
+
+
+/*#header {
   width: 100%;
   background-color: #fe1237;
   position: fixed;
@@ -66,7 +220,11 @@
     position: relative;
     left: 33%;
   }
-}
+}*/
+
+
+
+
 
 
 /*
