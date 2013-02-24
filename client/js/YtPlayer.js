@@ -31,8 +31,8 @@ var onYouTubeIframeAPIReady = function () {
 var YtPlayer = function(id, streamID) {
 
   var ytplayer = new YT.Player(id, {
-    height: '240',
-    width: '320',
+    height: '200',
+    width: '232',
     videoId: streamID,
     events: {
       'onReady': onPlayerReady,

@@ -103,7 +103,7 @@ var setCurPlayer = function(curPlayerID) {
   Session.set("current_player", curPlayerID);
 
   // scroll to new curPlayer
-  firstPOffset = $('.playerItem :first').offset().top;
+  firstPOffset = $('.player :first').offset().top;
   newOffset = $('#' + curPlayerID).offset().top - firstPOffset;
   $('html, body').animate({scrollTop: newOffset}, 400);
 
@@ -135,13 +135,6 @@ Template.header.playlistName = function() {
   return thisList.name;
 };
 
-Template.header.rendered = function() {
-  // var newHeight = $('#header').css("height");
-  // $('.headSection').css("height", newHeight);
-  // var searchHeight = $('.form-search').css("height");
-  // $('.form-search').css("margin-top", "" + newHeight - searchHeight);
-};
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Tracks template
@@ -161,6 +154,10 @@ Template.tracks.items = function() {
 ///////////////////////////////////////////////////////////////////////////////
 // Player template
 
+Template.player.trackNo = function() {
+  return Items.find({seqNo: {$lte: this.seqNo}}).count();
+};
+
 Template.player.isCurrent = function () {
   return Session.equals("current_player", this._id) ? "current" : '';
 };
@@ -174,7 +171,7 @@ Template.player.rendered = function() {
 };
 
 Template.player.events({
-  'click input.remItem' : function () {
+  'click button.remItem' : function () {
     var thisID = this._id;
     if (curPlayer === player[thisID]) {
       if (Items.find({}).count() > 1) {
@@ -360,11 +357,13 @@ Template.controls.events({
       type = "SoundCloud";
     }
 
+    var newSeqNo = Math.floor(Items.findOne({},{sort: {seqNo: -1}}).seqNo + 1);
+
     Items.insert({
       "playlistID" : testList, 
       "type" : type, 
       "streamID" : mediaID, 
-      "seqNo" : (Items.find({}).count() + 1) + "." + (new Date()).getTime(), 
+      "seqNo" : newSeqNo + "." + (new Date()).getTime(), 
       "addedBy" : "user1"
     });
   },

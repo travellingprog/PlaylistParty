@@ -8,7 +8,7 @@ var ScPlayer = function(id, streamID) {
   var isReady = false;
   var oldVolume = 50;
 
-  SC.oEmbed(streamID, {maxwidth: "320px"}, function(oEmbed) {
+  SC.oEmbed(streamID, {maxwidth: "232px", maxheight: "200px"}, function(oEmbed) {
     var embedHTML = (oEmbed.html).replace('<iframe', '<iframe id="' + id + '"');
     $("#" + id).replaceWith(embedHTML);
 

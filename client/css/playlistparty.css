@@ -1,50 +1,39 @@
 /* All Devices */
 
+body {
+  margin: 0;
+  padding: 0;
+}
+
+
+.span-custom {
+  float: left;
+  max-width: 280px;
+  min-height: 30px;
+  text-align: center;
+  margin: 10px 0px 0px 0px;
+
+
+  box-sizing:border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing:border-box;
+}
+
+
 #header {
   width: 100%;
   background-color: #fe1237;
-  position: absolute;
+  position: fixed;
   left: 0px;
+  right: 0px;
   top: 0px;
   max-height: 84px;
 }
 
-  #header .left {
-    float: left;  /* 192 pixels minimum */
-    width: 25%;
+  #header > * {
+    float: left;
+    max-height: 84px;
   }
-
-  #header .middle {
-    float: left;  /* 384 pixels minimum */
-    width: 50%;
-    max-height: 84px;   
-  }
-
-    .playlistName {
-      text-align: center;
-      color: white;
-      font-family: Haettenschweiler, Impact, fantasy;
-      height: 50%;
-      /*font-style: italic;*/
-    }
-
-      .playlistName h3 {
-        margin-top: 0px;
-        margin-bottom: 0px;
-        /*margin-top: 5px;*/
-      }
-
-    .deskMenu {
-      text-align: center;
-      margin-top: 0px;
-      height: 50%;
-    }
-
-  #header .right {
-    float: left;  /* 192 pixels minimum */
-    width: 25%; 
-  }
-
 
   #header .logo img{
     /* large logo: 190 x 74 */
@@ -55,8 +44,148 @@
   }
 
 
+#tracks {
+  margin: 0px auto 0px auto;
+  padding-top: 84px;
+}
+
+
+  .player {
+    margin-left: 2px;
+    margin-right: 2px;
+    padding: 5px 1px 5px 1px;
+    border: 1px solid #DDDDDD;
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
+  }
+
+  .player:hover, .player.current {
+    border-color: #0088CC;
+    box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
+  }
+
+  .player.current {
+    background-color: #e6f7ff;
+  }
+
+  .player .player-bottom {
+    text-align: left;
+    width: 228px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .player .userID {
+    color: green;
+    font-weight: bold;
+  }
+
+  .remItem {
+    color: red;
+    font-size: 75%;
+    padding: 0px;
+  }
+
+
+#controlbox {
+  margin-bottom: 0;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1030;
+  background-color: #F0F0F0;
+}
+
+
+
+/* Large Desktop Only */
+@media (min-width: 1241px) {
+  
+  .span-custom {
+    width: 20%
+  }
+
+  .span-custom:nth-child(5n+1){
+    clear: left;
+  }
+
+  #tracks {
+    max-width: 1400px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+
+/* Desktop Only */
+@media (min-width: 981px) and (max-width: 1240px) {
+
+  .span-custom {
+    width: 25%;
+  }
+
+  .span-custom:nth-child(4n+1){
+    clear: left;
+  }
+
+  #tracks {
+    max-width: 1120px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+
+/* Tablet Only */
+@media (min-width: 768px)  and (max-width: 980px) {
+
+  .span-custom {
+    width: 33.3333%;
+  }
+
+  .span-custom:nth-child(3n+1){
+    clear: left;
+  }
+
+  #tracks {
+    max-width: 840px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+
 /* Tablet and Desktop Only */
 @media (min-width: 768px) {
+
+  /* header */
+
+    #header .left, #header .right {
+      width: 25%;  /* 192 pixels minimum */
+    }
+
+    #header .middle {
+      width: 50%;  /* 384 pixels minimum */ 
+    }
+
+    .playlistName {
+      text-align: center;
+      color: white;
+      font-family: Haettenschweiler, Impact, fantasy;
+      height: 50%;
+    }
+
+      .playlistName h3 {
+        margin-top: 0px;
+        margin-bottom: 0px;
+      }
+
+    .deskMenu {
+      text-align: center;
+      margin-top: 0px;
+      height: 50%;
+    }
 
     #header .form-search {
       position: absolute;
@@ -65,9 +194,8 @@
     }
 
     #header .form-search .search-query {
-      width: 61% !important;
+      width: 61%;
     }
-
 }
 
 
@@ -75,154 +203,101 @@
 /* Landscape Phone And Portrait Phone */
 @media (max-width: 767px) {
 
-  #header .left {
-    width: 33% !important;
-  }
+  /* header */
 
-  #header .middle {
-    width: 34% !important;  
-  }
+    #header .left, #header .right {
+      width: 33%;
+    }
 
-  #header .right {
-    width: 33% !important;  
-  }
+    #header .middle {
+      width: 34%;  
+    }
 
-  #header .logo img{
-    margin: 3px auto 3px auto !important;
-  }
+    #header .logo img{
+      margin: 3px auto 3px auto !important;
+    }
 
-
-  .visible-phone.phoneMenu {
-    padding-top: 0.75em;
-    padding-left: 0.75em;
-  }
-
+    .visible-phone.phoneMenu {
+      padding-top: 0.75em;
+      padding-left: 0.75em;
+    }  
 }
+
 
 
 /* Landscape Phone only */
 @media (min-width: 481px) and (max-width: 767px) {
 
-  /* all columns: 160 pixels minimum */
-
-  .lsPhone {
-    display: block;
+  .span-custom {
+    width: 50%;
   }
 
-    .lsPhone.btn {
-      display: inline-block !important;
+  .span-custom:nth-child(2n+1) {
+    clear: left;
+  }
+
+  /* header */
+
+    /* header columns: 160 pixels minimum */
+
+    .lsPhone {
+      display: block;
     }
 
-  #header .form-search {
-    position: absolute;
-    padding-top: 0.75em;
-    padding-right: 0.75em;
-  }
+      .lsPhone.btn {
+        display: inline-block !important;
+      }
 
-  #header .form-search .search-query {
-    width: 56% !important;
-  }
+    #header .form-search {
+      position: absolute;
+      padding-top: 0.75em;
+      padding-right: 0.75em;
+    }
 
-  .porPhone {
-    display: none !important;
+    #header .form-search .search-query {
+      width: 56%;
+    }
+
+    .porPhone {
+      display: none !important;
+    }
+
+  #tracks {
+    max-width: 560px;
   }
 }
+
 
 
 /* Portrait Phone only */
 @media (max-width: 480px) {
 
-  /* all columns: 160 pixels MAXimum */
+  .span-custom {
+    width: 100%;
+  }   
 
-  .lsPhone {
-    display: none !important;
-  }
+  /* header */
 
-  .porPhone {
-    display: block;
-  }
+    /* header columns: 160 pixels MAXimum */
 
-    .porPhone.porPhoneSearch {
-      position: absolute;
-      top: 0.75em;
-      right: 0.75em;
+    .lsPhone {
+      display: none !important;
     }
 
-}
+    .porPhone {
+      display: block;
+    }
 
+      .porPhone.porPhoneSearch {
+        position: absolute;
+        top: 0.75em;
+        right: 0.75em;
+      }
 
-
-/*#header {
-  width: 100%;
-  background-color: #fe1237;
-  position: fixed;
-  left: 0px;
-  right: 0px;
-}
-
-#logoLarge {
-  margin: 10px auto 10px auto;
-  max-width: 200px;
-}
-
-#logoSmall {
-  margin: 5px auto 5px auto;
-  max-width: 50px;
-}
-
-
-.playlistName {
-  text-align: center;
-  color: white;
-  font-family: Haettenschweiler, Impact, fantasy;
-  font-style: italic;
-}
-
-.btn-toolbar {
-  text-align: center;
-}
-
-.btn-success {
-  font-weight: bold;
-}
-
-
-.right {
-  position: absolute;
-  right: 0px;
-  bottom: 0px;
-}
-
-
-.small {
-  display: none;
-}
-
-@media (max-width: 767px) {
-
-  .third {
-    float: left !important;
-    width: 33% !important;
+  #tracks {
+    max-width: 280px;
   }
 }
-
-@media (max-width: 480px) {
-
-  .medium {
-    display: none !important;
-  }
-
-  .small {
-    display: block;
-  }
-
-  .right .btn {
-    position: relative;
-    left: 33%;
-  }
-}*/
-
-
 
 
 
