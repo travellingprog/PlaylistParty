@@ -12,11 +12,9 @@ body {
   min-height: 30px;
   text-align: center;
   margin: 10px 0px 0px 0px;
-
-
-  box-sizing:border-box;
+  box-sizing: border-box;
   -moz-box-sizing: border-box;
-  -webkit-box-sizing:border-box;
+  -webkit-box-sizing: border-box;
 }
 
 
@@ -86,19 +84,106 @@ body {
     padding: 0px;
   }
 
+  #tracks:after {    /* Clear space for the footer */
+    content: "";
+    line-height: 110px;
+    display: block;
+    clear: both;
+    height: 110px;
+  }
 
-#controlbox {
+
+#footer {
+  width: 100%;
   margin-bottom: 0;
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 1030;
+  background-color: White;
+}
+
+#controlbox, #controlbox-minimized {
+  max-width: 450px;
+  margin: 0 auto 0 auto;
+  border-color: red;
+  border-radius: 4px 4px 0px 0px;
+  border-style: solid;
+  border-width: 1px 1px 0px 1px;
+  padding: 8px 15px 0px 15px;
   background-color: #F0F0F0;
 }
 
+  .hidden {
+    display: none !important;
+  }
+
+  #controlbox .btn:focus {
+    outline: none;
+  }
+
+  #timeIndicator, #trackIndicator {
+    color: DarkRed;
+    font-weight: bold;
+    margin-bottom: -12px;
+  }
+
+  #timeIndicator {
+    float: left;
+  }
+
+  #timeslider, #timeslider > .ui-slider-handle {
+    border-color: red;
+    background-image: none;
+    background-color: white;
+  }
+
+  #bottom-controls {
+    text-align: center;
+  }
+
+  #prev, #next {
+    height: 35px;
+    width: 55px;
+    padding: 0px;
+    border-width: 4px;
+    line-height: 16px;  
+  }
+
+  #prev {
+    border-radius: 25px 0px 0px 25px;
+  }
+
+  #play {
+    height: 60px;
+    width: 60px;
+    padding:0px;
+    border-radius: 30px;
+    border-width: 5px;
+    line-height: 21px;
+    vertical-align: center;
+  }
+
+  #next {
+    border-radius: 0px 25px 25px 0px;
+  }
+
+  #volumeslider {
+    display: inline-block;
+    width: 66px;
+  }
+
+  #volumeslider, #volumeslider > .ui-slider-handle {
+    border-color: red;
+    background-image: none;
+    background-color: Maroon;
+    border-color: red;
+  }
 
 
+
+/******************************************************************************/
 /* Large Desktop Only */
 @media (min-width: 1241px) {
   
@@ -274,104 +359,39 @@ body {
 
   .span-custom {
     width: 100%;
-  }   
+  }
+
+  .lsPhone {
+    display: none !important;
+  }
+
+  .porPhone {
+    display: block;
+  }
 
   /* header */
-
     /* header columns: 160 pixels MAXimum */
 
-    .lsPhone {
-      display: none !important;
+    .porPhone.porPhoneSearch {
+      position: absolute;
+      top: 0.75em;
+      right: 0.75em;
     }
 
-    .porPhone {
-      display: block;
-    }
-
-      .porPhone.porPhoneSearch {
-        position: absolute;
-        top: 0.75em;
-        right: 0.75em;
-      }
 
   #tracks {
     max-width: 280px;
   }
+
+
+  /* controls */
+  #controlbox {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+
+    #phoneVol {
+      margin-left: 10px;
+      display: inline-block !important;
+    }
 }
-
-
-
-
-/*
-*{
-  margin: 0;
-}
-
-
-
-.header {
-  width: 100%;
-  position: fixed;
-  top: 0px;
-  z-index: 10;
-  color: LawnGreen;
-  background-color: Black;
-  margin: 0 auto 0 auto;
-  height: 85px;
-  text-align: center;
-  border-bottom: 6px double green;
-}
-
-.wrapper {
-  margin: 0px auto 0px;
-  padding-top: 106px;
-  padding-bottom: 110px;
-}
-
-
-.playerItem {
-  padding: 5px;
-  margin: 20px;
-  z-index: 1;
-  border: 2px dotted blue;
-}
-
-.playerItem>* {
-  display: block;
-  margin: 5px auto;
-}
-
-.current {
-  border: 3px solid blue;
-}
-
-fieldset {
-  display: inline;
-}
-
-
-#controlFooter {
-  position: fixed;
-  bottom: 0px;
-  width: 100%;
-  z-index: 10;
-  color: LawnGreen;
-  background-color: Black;
-  border-top: 6px double green;
-  padding: 10px;
-}
-
-#controlBox {
-  display: block;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.urlControl {
-  margin-top: 15px;
-}
-
-#urlText {
-  width: 300px;
-}*/
-

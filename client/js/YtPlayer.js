@@ -49,21 +49,16 @@ var YtPlayer = function(id, streamID) {
   }
   
   this.setVolume = function (newVolume) {
-    if (typeof ytplayer.setvolume === 'function') {
+    if (typeof ytplayer.setVolume === 'function') {
       ytplayer.setVolume(newVolume);  
     }
   }
 
   this.updateVolume = function () {
-    Session.set("volume", ytplayer.getVolume());
-  }
-
-  this.mute = function () {
-    ytplayer.mute();
-  }
-
-  this.unMute = function () {
-    ytplayer.unMute();
+    var newVolume = ytplayer.getVolume();
+    if (newVolume != Session.get("volume")) {
+      Session.set("volume", ytplayer.getVolume());
+    }
   }
   
   this.setNewTime = function (newTime) {
@@ -76,10 +71,6 @@ var YtPlayer = function(id, streamID) {
 
   this.updateDuration = function() {
     Session.set("totalTime", Math.floor(ytplayer.getDuration()) );
-  }
-
-  this.updateMuted = function () {
-    Session.set("mute", ytplayer.isMuted());
   }
 };
 

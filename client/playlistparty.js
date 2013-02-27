@@ -38,14 +38,6 @@ var Player = function(embedPlayer, userID, id) {
   this.updateVolume = function () { 
     return embedPlayer.updateVolume(); 
   };
-
-  this.mute = function () {
-    embedPlayer.mute();
-  }
-
-  this.unMute = function () {
-    embedPlayer.unMute();
-  }
   
   this.setNewTime = function (newTime) {
     embedPlayer.setNewTime(newTime);
@@ -58,10 +50,6 @@ var Player = function(embedPlayer, userID, id) {
   this.updateDuration = function() {
     return embedPlayer.updateDuration();
   };
-
-  this.updateMuted = function () {
-    return embedPlayer.updateMuted();
-  }
 };
 
 
@@ -80,14 +68,14 @@ var createPlayer = function(item) {
 
 // set periodic updates
 var updatePlayerInfo = function() {
-  if (curPlayer) {
+  if (curPlayer && !pauseUpdates) {
     curPlayer.updateVolume();
     curPlayer.updateCurrentTime();
-    curPlayer.updateMuted();
+    curPlayer.updateDuration();
   }  
 };
 
-setInterval(updatePlayerInfo, 250);
+setInterval(updatePlayerInfo, 500);
 
 
 // set the current player
@@ -104,7 +92,7 @@ var setCurPlayer = function(curPlayerID) {
 
   // scroll to new curPlayer
   firstPOffset = $('.player :first').offset().top;
-  newOffset = $('#' + curPlayerID).offset().top - firstPOffset;
+  newOffset = $('#' + curPlayerID).parent().offset().top - firstPOffset;
   $('html, body').animate({scrollTop: newOffset}, 400);
 
   curPlayer.updateDuration();
@@ -134,6 +122,41 @@ Template.header.playlistName = function() {
   if (thisList === undefined) return "Welcome";
   return thisList.name;
 };
+
+Template.header.shuffleStatus = function () {
+  return Session.get("shuffle") ? "ON" : "off";
+};
+
+Template.header.loopStatus = function () {
+  return Session.get("loop") ? "ON" : "off";
+};
+
+Template.header.events({
+  'click .shuffle' : function() {
+    Session.set("shuffle", ! Session.get("shuffle"));
+    return false;
+  },
+
+
+  'click .loop' : function() {
+    Session.set("loop", ! Session.get("loop"));
+    return false;
+  },
+
+  'keypress #normSearchField' : function(event) {
+    if (event.which == 13) {
+      addURL(event.currentTarget.value);
+      event.currentTarget.value = "";
+      return false;
+    }  
+  },
+
+  'click #normSearchBtn' : function() {
+    addURL($('#normSearchField').val());
+    $('#normSearchField').val("");
+    return false;
+  }
+});
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -176,7 +199,7 @@ Template.player.events({
     if (curPlayer === player[thisID]) {
       if (Items.find({}).count() > 1) {
         goToNextPlayer();
-        //note: going to next track will auto-pause the current one
+        //note: going to the next track will auto-pause the current one
       } else {
         curPlayer.pause();
       }
@@ -195,24 +218,54 @@ Template.player.events({
 // Controls template
 
 Session.set("playing", false);
-Session.set("volume", 50);
+Session.set("volume", 80);
 Session.set("mute", false);
 Session.set("curTime", 0);
 Session.set("totalTime", 0);
+Session.set("shuffle", false);
+Session.set("loop", false);
+Session.set("controlsHidden", false);
+var timeslider, volumeslider;
+var pauseUpdates = false;
 
 
-Template.controls.playOrPause = function() {
-  return Session.get("playing") ? "Pause" : "Play";
+Template.controls.isHidden = function() {
+  return Session.get("controlsHidden") ? "hidden" : "";
 };
 
 
-Template.controls.volValue = function() {
-  return Math.round(Session.get("volume"));
+Template.controls.isHidden2 = function() {
+  return Session.get("controlsHidden") ? "" : "hidden";
 };
 
 
-Template.controls.muteOrUnmute = function() {
-  return Session.get("mute") ? "Unmute" : "Mute";
+initiateTimeSlider = function () {
+  timeslider.slider({
+    range: "min", 
+    animate: true,
+    create: timeTracking,
+    start: function() { pauseUpdates = true; },
+    slide: function(event, ui) { Session.set("curTime", ui.value); },
+    stop: function(event, ui) {
+      Session.set("curTime", ui.value);
+      if (curPlayer) curPlayer.setNewTime(ui.value);
+      setTimeout(function () {
+        pauseUpdates = false;
+        timeTracking();
+      }, 1000);
+    }
+  });
+};
+
+timeTracking = function () {
+  Meteor.autorun(function () {
+    if (pauseUpdates) return;
+    timeslider.slider("value", Session.get("curTime"));
+  });
+
+  Meteor.autorun(function () {
+    timeslider.slider("option", "max", Session.get("totalTime"));
+  });
 };
 
 
@@ -238,95 +291,85 @@ Template.controls.numTracks = function() {
 };
 
 
-var showTime = function(total) {
-  // format the time, received in number of seconds
-  var hour, min, sec;
-  
-  if (total >= 3600) {
-    hour = Math.floor(total / 3600);
-    total = total % 3600;
-    if (hour < 10) hour = '0' + hour;
-    hour = hour + ':';
-  } else {
-    hour = '';
-  }
+Template.controls.shufflePic = function () {
+  return Session.get("shuffle") ? "/Shuffle.png" : "/ShuffleDisabled.png";
+}
 
-  if (total >= 60) {
-    min = Math.floor(total / 60);
-    total = total % 60;
-    if (min < 10) min = '0' + min;
-    min = min + ':';
-  } else {
-    min = '00:';
-  }
 
-  sec = Math.round(total);
-  // sec = total;
-  if (sec < 10) sec = '0' + sec;
-  return hour + min + sec;
+Template.controls.loopPic = function () {
+  return Session.get("loop") ? "/Loop.png" : "/LoopDisabled.png";
+}
+
+
+Template.controls.playOrPause = function() {
+  return Session.get("playing") ? "/Pause.png" : "/Play.png";
+};
+
+
+initiateVolumeSlider = function () {
+  volumeslider.slider({
+    range: "min", 
+    animate: true,
+    "value": "80",
+    create: volumeTracking,
+    start: function() { pauseUpdates = true },
+    slide: function(event, ui) { if (curPlayer) curPlayer.setVolume(ui.value) },
+    stop: function(event, ui) { setNewVolume(ui.value) }
+  });
+};
+
+volumeTracking = function () {
+  Meteor.autorun(function () {
+    if (pauseUpdates) return;
+    volumeslider.slider("value", Session.get("volume"));
+    updateVolTooltip(Session.get("volume"));
+  });
+};
+
+setNewVolume = function (volume) {
+  pauseUpdates = true;
+  Session.set("volume", volume);
+  if (curPlayer) curPlayer.setVolume(volume);
+  updateVolTooltip(volume);
+  setTimeout(function () {
+    pauseUpdates = false;
+    volumeTracking();
+  }, 500);  
+};
+
+updateVolTooltip = function (volume) {
+  var phoneVol = $("#phoneVol")
+  phoneVol.tooltip('destroy');
+  phoneVol.tooltip({title: (Math.round(volume)).toString() });
+  phoneVol.tooltip('show');
 };
 
 
 Template.controls.events({
 
-  'click input.playback' : function () {
-    if ( curPlayer && Session.get("playing") ) {
-      curPlayer.pause();
-      Session.set("playing", false);
-    } else if (curPlayer) {
-      curPlayer.play();
-      Session.set("playing", true);
-    }
+  'click #minControls': function () {
+    Session.set("controlsHidden", true)
   },
 
 
-  'click input.decVolume' : function() {
-    var volume = Session.get("volume") - 5;
-    if (volume < 0) volume = 0;
-    Session.set("volume", volume);
-    if (curPlayer) curPlayer.setVolume(volume);
+  'click #openControls': function () {
+    Session.set("controlsHidden", false)
   },
 
 
-  'click input.incVolume' : function() {
-    var volume = Session.get("volume") + 5;
-    if (volume > 100) volume = 100;
-    Session.set("volume", volume);
-    if (curPlayer) curPlayer.setVolume(volume);
+  'click .shuffle' : function() {
+    Session.set("shuffle", ! Session.get("shuffle"));
   },
 
 
-  'click input.muteCtrl' : function() {
-    if ( curPlayer && Session.get("mute") ) {
-      curPlayer.unMute();
-      Session.set("mute", false);
-    } else if (curPlayer) {
-      curPlayer.mute();
-      Session.set("mute", true);
-    }
+  'click .loop' : function() {
+    Session.set("loop", ! Session.get("loop"));
   },
 
 
-  'click input.decTime' : function() {
-    var step = Math.ceil(Session.get("totalTime") / 10);  // <- Set as variable?
-    var newTime = Session.get("curTime") - step;
-    if (newTime < 0) newTime = 0;
-    // Session.set("curTime", newTime);   <- FUTURE USE, maybe
-    curPlayer.setNewTime(newTime);
-  },
+  'click #prev' : function() {
+    if (! curPlayer) return;
 
-
-  'click input.incTime' : function() {
-    totalTime = Session.get("totalTime")
-    var step = Math.ceil(totalTime / 10);
-    var newTime = Session.get("curTime") + step;
-    if (newTime > totalTime) newTime = totalTime;
-    // Session.set("curTime", newTime);   <- FUTURE USE, maybe
-    curPlayer.setNewTime(newTime);
-  },
-
-
-  'click input.prevTrack' : function() {
     var curItem = Items.findOne({"_id" : curPlayer.id});
     var prevItem = Items.findOne({seqNo: {$lt: curItem.seqNo}}, 
                                  {sort: {seqNo: -1}});
@@ -339,33 +382,43 @@ Template.controls.events({
   },
 
 
-  'click input.nextTrack' : function() {
+  'click #play' : function () {
+    if (! curPlayer) return;
+
+    if (Session.get("playing")) {
+      curPlayer.pause();
+      Session.set("playing", false);
+    } else {
+      curPlayer.play();
+      Session.set("playing", true);
+    }
+  },
+
+
+  'click #next' : function() {
+    if (! curPlayer) return;
     goToNextPlayer();
   },
 
 
-  'click input.addURL' : function () {
-    var url = $('#urlText').val();
-    $('#urlText').val('');
-    var mediaID, type;
+  'click #minVolume' : function () {
+    setNewVolume(0);
+  },
 
-    if (url.search("youtube") !== -1) {
-      mediaID = getYoutubeID(url);
-      type = "YouTube";
-    } else if (url.search("soundcloud") !== -1) {
-      mediaID = url;
-      type = "SoundCloud";
-    }
+  'click #maxVolume' : function () {
+    setNewVolume(100);
+  },
 
-    var newSeqNo = Math.floor(Items.findOne({},{sort: {seqNo: -1}}).seqNo + 1);
+  'click #volumeDown' : function() {
+    var volume = Session.get("volume") - 10;
+    if (volume < 0) volume = 0;
+    setNewVolume(volume);
+  },
 
-    Items.insert({
-      "playlistID" : testList, 
-      "type" : type, 
-      "streamID" : mediaID, 
-      "seqNo" : newSeqNo + "." + (new Date()).getTime(), 
-      "addedBy" : "user1"
-    });
+  'click #volumeUp' : function() {
+    var volume = Session.get("volume") + 10;
+    if (volume > 100) volume = 100;
+    setNewVolume(volume);
   },
 
 
@@ -408,6 +461,63 @@ Template.controls.events({
 });
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Utility Functions
+
+var showTime = function(total) {
+  // format the time, received in number of seconds, to [HH:]MM:SS
+  var hour, min, sec;
+  
+  if (total >= 3600) {
+    hour = Math.floor(total / 3600);
+    total = total % 3600;
+    if (hour < 10) hour = '0' + hour;
+    hour = hour + ':';
+  } else {
+    hour = '';
+  }
+
+  if (total >= 60) {
+    min = Math.floor(total / 60);
+    total = total % 60;
+    if (min < 10) min = '0' + min;
+    min = min + ':';
+  } else {
+    min = '00:';
+  }
+
+  sec = Math.round(total);
+  // sec = total;
+  if (sec < 10) sec = '0' + sec;
+  return hour + min + sec;
+};
+
+var addURL = function(url) {
+  if (url == "") return;
+  var mediaID, type;
+
+  if (url.search("youtube") !== -1) {
+    mediaID = getYoutubeID(url);
+    type = "YouTube";
+  } else if (url.search("soundcloud") !== -1) {
+    mediaID = url;
+    type = "SoundCloud";
+  } else {
+    return;
+  }
+
+  var newSeqNo = Math.floor(Items.findOne({},{sort: {seqNo: -1}}).seqNo + 1);
+
+  Items.insert({
+    "playlistID" : testList, 
+    "type" : type, 
+    "streamID" : mediaID,
+    "title": "Item title",
+    "seqNo" : newSeqNo + "." + (new Date()).getTime(), 
+    "addedBy" : "user1"
+  });
+};
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Code to run on the client as soon as the DOM is ready
@@ -426,6 +536,17 @@ Meteor.startup(function () {
   });
   Session.set("ScAPIready", true);
 
+  // sliders
+  timeslider = $('#timeslider');
+  volumeslider = $('#volumeslider');
+  initiateTimeSlider();
+  initiateVolumeSlider();
+
+  // phoneVol tooltip
+  $("#phoneVol").tooltip({
+    title: (Session.get("volume")).toString(), 
+    delay: 500
+  });
 
   // Flash detection
   if (swfobject.hasFlashPlayerVersion("10.0.22")) {

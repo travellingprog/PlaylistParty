@@ -36,8 +36,12 @@
           <ul class="dropdown-menu">
             <li class="disabled"><a href="/"><i class="icon-th-large"></i> Grid View </a></li>            
             <li><a href="/"><i class="icon-th-list"></i> List View </a></li>
-            <li><a href="/"><i class="icon-cog"></i> Settings </a></li>          
-            <li class="porPhone"><a href="/"><span class="label label-success"><i class="icon-envelope icon-white"></i>  INVITE</span></a></li>  <!-- Portrait Phone option only -->
+            <li><a href="/"><i class="icon-cog"></i> Settings </a></li>
+            <!-- Portrait Phone options only: -->
+              <li class="porPhone"><a href="/"><span class="label label-success"><i class="icon-envelope icon-white"></i>  INVITE</span></a></li>
+              <li class="porPhone divider"></li>
+              <li class="porPhone"><a class="shuffle" href="/"><i class="icon-random"></i> Shuffle ({{shuffleStatus}})</a></li>
+              <li class="porPhone"><a class="loop" href="/"><i class="icon-repeat"></i> Loop ({{loopStatus}})</a></li>
           </ul>
         </div>
 
@@ -72,34 +76,20 @@
     </div>
 
 
-    <!-- Right -->
+    <!-- Right: Search -->
     <div class="right">
       
-      <!-- Tablet and Desktop: Search -->
-      <div class="hidden-phone">
-        <form class="form-search">
-          <div class="input-append">
-            <input type="text" class="search-query" placeholder="Search...">
-            <button type="submit" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Phone: Search -->
-      <div class="visible-phone">
-
-        <!-- landscape phone: -->
-        <form class="lsPhone form-search">
-          <div class="input-append">
-            <input type="text" class="search-query" placeholder="Search...">
-            <button type="submit" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
-          </div>
-        </form>
-
-        <!-- portrait phone: -->
-        <div class="porPhone porPhoneSearch">
-          <button type="button" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
+      <!-- Tablet, Desktop and Landscape Phone: -->
+      <form class="lsPhone form-search">
+        <div class="input-append">
+          <input type="text" id="normSearchField" class="search-query" placeholder="Search...">
+          <button type="submit" id="normSearchBtn" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
         </div>
+      </form>
+        
+      <!-- portrait phone: -->
+      <div class="visible-phone porPhone porPhoneSearch">
+        <button type="button" id="phoneSearchBtn" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
       </div>
     </div>
 
@@ -117,6 +107,7 @@
   </div>
 </template>
 
+
 <template name="player">
   <div class="span-custom">
     <div class ="player {{isCurrent}}">
@@ -130,7 +121,7 @@
           <button type="button" class="remItem btn btn-link">remove</button>
         {{else}}
           <button type="button" class="btn btn-mini btn-success" style="float: left"><i class="icon-thumbs-up icon-white"></i> Nice!</button>
-          <p class="text-right" >0 <i class="icon-thumbs-up"></i></p></div>
+          <p class="text-right">0 <i class="icon-thumbs-up"></i></p>
         {{/if}}
       </div>
       {{/constant}}
@@ -140,70 +131,35 @@
 
 
 <template name="controls">
-  <div id="controlbox">
-    fixed to the bottom?
+  <div id="footer">    
+    <div id="controlbox" class="{{isHidden}}">
+      {{#constant}}
+      <div id="timeslider"></div>
+      {{/constant}}
+      <span id="timeIndicator">{{curTime}} / {{totalTime}} </span> 
+      <p id="trackIndicator" class="text-right">{{curTrack}} of {{numTracks}}</p>
+      <div id="bottom-controls">
+        <button id="minControls" type="button" class="btn btn-link btn-mini"><i class="icon-chevron-down"></i></button>
+        <button type="button" class="shuffle lsPhone btn btn-link btn-mini"><img src="{{shufflePic}}" width="16" height="14"></img></button>
+        <button type="button" class="loop lsPhone btn btn-link btn-mini"><img src="{{loopPic}}" width="14" height="14"></i></button>
+        <button id="prev" type="button" class="btn btn-danger"><img src="/Prev.png" width="16" height="14"></button>
+        <button id="play" type="button" class="btn btn-danger"><img src="{{playOrPause}}" width="21" height="21"></button>
+        <button id="next" type="button" class="btn btn-danger"><img src="/Next.png" width="16" height="14"></button>
+        <button id="minVolume" type="button" class="lsPhone btn btn-link btn-mini"><i class="icon-volume-off"></i></button>
+        {{#constant}}
+        <div id="volumeslider" class ="lsPhone"></div>
+        {{/constant}}
+        <button id="maxVolume" type="button" class="lsPhone btn btn-link btn-mini"><i class="icon-volume-up"></i></button>
+        <!-- Portrait Phone: Volume -->
+        <div id ="phoneVol" class="visible-phone porPhone btn-group">
+          <button id="volumeDown" type="button" class="btn btn-danger"><i class="icon-volume-down icon-white"></i></button>
+          <button id="volumeUp" type="button" class="btn btn-danger"><i class="icon-volume-up icon-white"></i></button>
+        </div>
+      </div>
+    </div>
+    <div id="controlbox-minimized" class="{{isHidden2}}">
+      <button id="openControls" type="button" class="btn btn-link btn-small"><i class="icon-chevron-up"></i></button>
+    </div>
   </div>
 </template>
 
-
-<template name="pageOld">
-  {{> header}}
-  {{> tracks}}
-  {{> controls}}
-</template>
-
-
-<template name="tracksOld">
-  <div class="wrapper">
-  {{#if APIsReady}}
-  {{#each items}}
-    {{> player}}
-  {{/each}}
-  {{/if}}
-  </div>
-</template>
-
-
-<template name="playerOld">
-  <div class="playerItem {{isCurrent}}">
-    {{#constant}}
-    <div id="{{_id}}"></div>
-    {{#if myItem}}
-    <input type="button" class="remItem" value="remove" />
-    {{/if}}
-    {{/constant}}
-  </div>
-</template>
-
-
-<template name="controlsOld">
-<div id="controlFooter">
-<div id="controlBox">
-  <div>
-    <input type="button" class="playback" value="{{playOrPause}}" />
-    <fieldset class="volControl">
-      <legend>Volume: ({{volValue}}/100)</legend>
-      <input type="button" class="decVolume" value="decrease" />
-      <input type="button" class="incVolume" value="increase" />
-    </fieldset>
-    <input type="button" class="muteCtrl" value="{{muteOrUnmute}}" />
-    <fieldset class="timeControl">
-      <legend>Time: ({{curTime}}/{{totalTime}})</legend>
-      <input type="button" class="decTime" value="<<" />
-      <input type="button" class="incTime" value=">>" />
-    </fieldset>
-    <fieldset class="tracksControl">
-      <legend>Track {{curTrack}}/{{numTracks}}</legend>
-      <input type="button" class="prevTrack" value="|<<" />
-      <input type="button" class="nextTrack" value=">>|" />
-    </fieldset>
-  </div>
-  <div class="urlControl">
-    <label>URL: <input type="text" id="urlText"></label>
-    <input type="button" class="addURL" value="Add" />
-    <input type="button" class="ytSearch" value="YT Search" />
-    <input type="button" class="scSearch" value="SC Search" />
-  </div>
-</div>
-</div>
-</template>

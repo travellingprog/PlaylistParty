@@ -49,17 +49,6 @@ var ScPlayer = function(id, streamID) {
     // NOTE: The SoundCloud widget does not offer any volume control... yet
     return;
   }
-
-  this.mute = function () {
-    if (! isReady) return;
-    oldVolume = Session.get("volume");
-    scplayer.setVolume(0);
-  }
-
-  this.unMute = function () {
-    if (! isReady) return;
-    scplayer.setVolume(oldVolume);
-  }
   
   this.setNewTime = function (newTime) {
     scplayer.seekTo(newTime * 1000);
@@ -77,11 +66,6 @@ var ScPlayer = function(id, streamID) {
     scplayer.getDuration(function (duration) {
       Session.set("totalTime", Math.round(duration / 1000));
     });
-  }
-
-  this.updateMuted = function () {
-    // NOTE: The SoundCloud widget does not offer any mute control... yet
-    return;
   }
 }
 
