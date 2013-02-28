@@ -26,6 +26,7 @@ body {
   right: 0px;
   top: 0px;
   max-height: 84px;
+  z-index: 1030;
 }
 
   #header > * {
@@ -42,11 +43,22 @@ body {
   }
 
 
-#tracks {
+#tracks, #search {
   margin: 0px auto 0px auto;
   padding-top: 84px;
 }
 
+  /* modded BootStrap tab behavior, because "display:none" is forbidden by Soundcloud API */
+  #tracks.active {
+    visibility: visible !important;
+    position: static !important;
+  }
+
+  #tracks.tab-pane {
+    display: block !important;
+    visibility: hidden;
+    position: fixed;
+  }
 
   .player {
     margin-left: 2px;

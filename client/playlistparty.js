@@ -90,13 +90,17 @@ var setCurPlayer = function(curPlayerID) {
   curPlayer = player[curPlayerID];
   Session.set("current_player", curPlayerID);
 
-  // scroll to new curPlayer
-  firstPOffset = $('.player :first').offset().top;
-  newOffset = $('#' + curPlayerID).parent().offset().top - firstPOffset;
-  $('html, body').animate({scrollTop: newOffset}, 400);
+  scrollToCurPlayer();
 
   curPlayer.updateDuration();
   if (continuePlaying) curPlayer.play();  // may not work on mobile devices
+};
+
+
+var scrollToCurPlayer = function() {
+  var firstPOffset = $('.player :first').offset().top;
+  var newOffset = $('#' + curPlayer.id).parent().offset().top - firstPOffset;
+  $('html, body').animate({scrollTop: newOffset}, 400);  
 };
 
 
@@ -141,6 +145,10 @@ Template.header.events({
   'click .loop' : function() {
     Session.set("loop", ! Session.get("loop"));
     return false;
+  },
+
+  'click button.grid' : function(event) {
+    scrollToCurPlayer();
   },
 
   'keypress #normSearchField' : function(event) {
