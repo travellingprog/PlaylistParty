@@ -121,6 +121,12 @@ var goToNextPlayer = function () {
 ///////////////////////////////////////////////////////////////////////////////
 // Header template
 
+var normSearch = function() {
+  $('#normSearchBtn').tab('show');
+  mediaSearch($('#normSearchField').val());
+  $('#normSearchField').val("");
+};
+
 Template.header.playlistName = function() {
   var thisList = Playlist.findOne(testList);
   if (thisList === undefined) return "Welcome";
@@ -151,18 +157,19 @@ Template.header.events({
     scrollToCurPlayer();
   },
 
+  'click .invite' : function () {
+    Session.set("searching", ! Session.get("searching"));
+  },
+
   'keypress #normSearchField' : function(event) {
     if (event.which == 13) {
-      addURL(event.currentTarget.value);
-      event.currentTarget.value = "";
+      normSearch();
       return false;
-    }  
+    }
   },
 
   'click #normSearchBtn' : function() {
-    addURL($('#normSearchField').val());
-    $('#normSearchField').val("");
-    return false;
+    normSearch();
   }
 });
 
@@ -427,44 +434,171 @@ Template.controls.events({
     var volume = Session.get("volume") + 10;
     if (volume > 100) volume = 100;
     setNewVolume(volume);
+  }
+
+});
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Search template
+Session.set("searching", false);
+Session.set("ytSearchComplete", false);
+Session.set("ytSearchIndex", 0);
+var ytResult = new Array();
+var scResult = new Array();
+var ytSearchError;
+
+
+
+var mediaSearch = function (query) {
+  Session.set("searching", true);
+  ytSearch(query);  // Youtube
+  scSearch(query);  // SoundCloud
+  window.scrollTo(0,0);
+};
+
+
+var ytSearch = function (query) {
+  var searchURL = "https://www.googleapis.com/youtube/v3/search";
+  var param = Object();
+  param["q"] = '"' + query + '"';
+  param["type"] = "video";
+  param["key"] = "AIzaSyC9NItPbDx4SdF3DQJn-5dT2fL1qtNACKI";
+  param["videoEmbeddable"] = true;
+  param["maxResults"] = 50;
+  param["part"] = "id, snippet";
+  param["fields"] =  "items(id/videoId, ";
+  param["fields"] += "snippet(title, thumbnails/default/url))";
+
+  Meteor.http.get(searchURL, {params: param}, function (error, result)  {
+    Session.set("ytSearchComplete", true);
+    
+    if (error) {
+      ytSearchError = error;
+      return;
+    }
+
+    var resp = result.data;
+    var ytCount = resp.items.length;
+    var item, title, titleIndex, artist;
+
+    for (var i=0; i < ytCount; i++) {
+      item = resp.items[i];
+      title = item.snippet.title;
+      titleIndex = title.indexOf(" - ");
+      if (titleIndex !== -1) {
+        artist = title.substring(0, titleIndex);
+        title = title.substring(titleIndex + 3);
+      } else {
+        artist = "";
+      }
+
+      ytResult[i] = {
+        "artist" : artist,
+        "title" : title,
+        "pic" : item.snippet.thumbnails.default.url,
+        "streamID" : item.id.videoId
+      };
+    }
+  });
+};
+
+
+var scSearch = function (query) {
+  var param = Object();
+  param["q"] = query;
+  param["order"] = "hotness";
+  param["filter"] = "public, streamable";
+
+  SC.get('/tracks', param, function(resp, error) {
+    if (error) 
+
+    var scCount = resp.length;
+
+    for (var i=0; i < scCount; i++) {
+      item = resp[i];
+      scResult[i] = {
+        "artist" : item.user.username,
+        "title" : item.title,
+        "pic" : (item.artwork_url) ? item.artwork_url : item.waveform_url,
+        "streamID": item.permalink_url                                          
+      };
+    }
+  });
+};
+
+
+var addURL = function(url) {
+  if (url == "") return;
+  var mediaID, type;
+
+  if (url.search("youtube") !== -1) {
+    mediaID = getYoutubeID(url);
+    type = "YouTube";
+  } else if (url.search("soundcloud") !== -1) {
+    mediaID = url;
+    type = "SoundCloud";
+  } else {
+    return;
+  }
+
+  var newSeqNo = Math.floor(Items.findOne({},{sort: {seqNo: -1}}).seqNo + 1);
+
+  Items.insert({
+    "playlistID" : testList, 
+    "type" : type, 
+    "streamID" : mediaID,
+    "title": "Item title",
+    "seqNo" : newSeqNo + "." + (new Date()).getTime(), 
+    "addedBy" : "user1"
+  });
+};
+
+
+Template.search.searching = function() {
+  return Session.get("searching");
+};
+
+Template.search.ytSearchComplete = function() {
+  return Session.get("ytSearchComplete");
+};
+
+Template.search.noYtSearchError = function () {
+  return (! ytSearchError);
+};
+
+Template.search.ytResults = function () {
+  if (ytResult.length === 0) return;
+  var startIndex = Session.get("ytSearchIndex");
+  var endIndex = startIndex + 5;
+  if (ytResult.length < endIndex) endIndex = ytResult.length;
+  return ytResult.slice(startIndex, endIndex);
+};
+
+Template.search.ytErrorMsg = function() {
+  return "Youtube has reported an error";
+};
+
+Template.search.disableYtPrev = function () {
+  if (Session.get("ytSearchIndex") === 0) return "disabled";
+  return "";
+}
+
+Template.search.disableYtNext = function () {
+  if ((Session.get("ytSearchIndex") + 5) >= ytResult.length) return "disabled";
+  return "";
+}
+
+
+Template.search.events({
+  'click #ytPrev' : function() {
+    if (Session.get("ytSearchIndex") === 0) return;
+    Session.set("ytSearchIndex", Session.get("ytSearchIndex") - 5);
   },
 
-
-  'click input.ytSearch' : function () {
-    var searchURL = "https://www.googleapis.com/youtube/v3/search";
-    var param = Object();
-    param["q"] = "Eminem Kill You";
-    param["type"] = "video";
-    param["key"] = "AIzaSyC9NItPbDx4SdF3DQJn-5dT2fL1qtNACKI";
-    param["videoEmbeddable"] = true;
-    param["maxResults"] = 9;
-    param["part"] = "id, snippet";
-    param["fields"] =  "etag, nextPageToken, prevPageToken, items(id/videoId, ";
-    param["fields"] += "snippet(title, thumbnails/default/url))";
-
-    Meteor.http.get(searchURL, {params: param}, function (error, result)  {
-      var vidResults = result.data;
-      alert(vidResults.items[0].snippet.thumbnails.default.url);
-    });
-  },
-
-
-  'click input.scSearch' : function () {
-    var param = Object();
-    param["q"] = "Mad Decent";
-    param["order"] = "hotness";
-    param["filter"] = "public, streamable";
-
-    SC.get('/tracks', param, function(tracks) {
-      var resString = "Number of results: " + tracks.length + "\n";
-      resString += "\n";
-      resString += "First track title: " + tracks[0].title + "\n";
-      resString += "Posted by: " + tracks[0].user.username + "\n";
-      resString += "artwork: " + tracks[0].artwork_url + "\n";
-      resString += "url: " + tracks[0].permalink_url + "\n";
-
-      alert(resString);
-    });
+  'click #ytNext' : function() {
+    if ((Session.get("ytSearchIndex") + 5) >= ytResult.length) return;
+    Session.set("ytSearchIndex", Session.get("ytSearchIndex") + 5);
   }
 });
 
@@ -498,32 +632,6 @@ var showTime = function(total) {
   // sec = total;
   if (sec < 10) sec = '0' + sec;
   return hour + min + sec;
-};
-
-var addURL = function(url) {
-  if (url == "") return;
-  var mediaID, type;
-
-  if (url.search("youtube") !== -1) {
-    mediaID = getYoutubeID(url);
-    type = "YouTube";
-  } else if (url.search("soundcloud") !== -1) {
-    mediaID = url;
-    type = "SoundCloud";
-  } else {
-    return;
-  }
-
-  var newSeqNo = Math.floor(Items.findOne({},{sort: {seqNo: -1}}).seqNo + 1);
-
-  Items.insert({
-    "playlistID" : testList, 
-    "type" : type, 
-    "streamID" : mediaID,
-    "title": "Item title",
-    "seqNo" : newSeqNo + "." + (new Date()).getTime(), 
-    "addedBy" : "user1"
-  });
 };
 
 

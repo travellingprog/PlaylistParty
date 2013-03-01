@@ -20,7 +20,8 @@ body {
 
 #header {
   width: 100%;
-  background-color: #fe1237;
+  /*background-color: #fe1237;*/
+  background-color: red;
   position: fixed;
   left: 0px;
   right: 0px;
@@ -43,10 +44,21 @@ body {
   }
 
 
-#tracks, #search {
+.tab-pane {
   margin: 0px auto 0px auto;
   padding-top: 84px;
 }
+
+.tab-pane:after {    /* Clear space for the footer */
+  content: "";
+  line-height: 110px;
+  display: block;
+  clear: both;
+  height: 110px;
+}
+
+
+/* tracks */
 
   /* modded BootStrap tab behavior, because "display:none" is forbidden by Soundcloud API */
   #tracks.active {
@@ -96,12 +108,24 @@ body {
     padding: 0px;
   }
 
-  #tracks:after {    /* Clear space for the footer */
-    content: "";
-    line-height: 110px;
-    display: block;
+
+/* search */
+
+  #search > h3 {
+    text-align: center;
+    color: DarkRed;
+  }
+
+  .APIlogo {
+    text-align: center;
     clear: both;
-    height: 110px;
+    margin: 10px 0 10px 0;
+  }
+
+  #search > .btn-toolbar {
+    clear: both;
+    text-align: center;
+    margin-bottom: 30px;
   }
 
 
@@ -203,11 +227,11 @@ body {
     width: 20%
   }
 
-  .span-custom:nth-child(5n+1){
+  .span-custom:nth-of-type(5n+1){
     clear: left;
   }
 
-  #tracks {
+  .tab-pane {
     max-width: 1400px;
     padding-left: 20px;
     padding-right: 20px;
@@ -222,11 +246,11 @@ body {
     width: 25%;
   }
 
-  .span-custom:nth-child(4n+1){
+  .span-custom:nth-of-type(4n+1){
     clear: left;
   }
 
-  #tracks {
+  .tab-pane {
     max-width: 1120px;
     padding-left: 10px;
     padding-right: 10px;
@@ -241,11 +265,11 @@ body {
     width: 33.3333%;
   }
 
-  .span-custom:nth-child(3n+1){
+  .span-custom:nth-of-type(3n+1){
     clear: left;
   }
 
-  #tracks {
+  .tab-pane {
     max-width: 840px;
     padding-left: 10px;
     padding-right: 10px;
@@ -329,7 +353,7 @@ body {
     width: 50%;
   }
 
-  .span-custom:nth-child(2n+1) {
+  .span-custom:nth-of-type(2n+1) {
     clear: left;
   }
 
@@ -359,7 +383,7 @@ body {
       display: none !important;
     }
 
-  #tracks {
+  .tab-pane {
     max-width: 560px;
   }
 }
@@ -391,7 +415,7 @@ body {
     }
 
 
-  #tracks {
+  .tab-pane {
     max-width: 280px;
   }
 

@@ -12,7 +12,7 @@
 
 <template name="page">
   {{> header}}
-  {{> tracks}}
+  {{> tabs}}
   {{> controls}}
 </template>
 
@@ -36,7 +36,7 @@
           <ul class="dropdown-menu">
             <li class="disabled"><a href="/"><i class="icon-th-large"></i> Grid View </a></li>            
             <li><a href="/"><i class="icon-th-list"></i> List View </a></li>
-            <li><a href="/"><i class="icon-cog"></i> Settings </a></li>
+            <li><a href="#settings" data-toggle="tab"><i class="icon-cog"></i> Settings </a></li>
             <!-- Portrait Phone options only: -->
               <li class="porPhone"><a href="/"><span class="label label-success"><i class="icon-envelope icon-white"></i>  INVITE</span></a></li>
               <li class="porPhone divider"></li>
@@ -63,9 +63,9 @@
             <div class="btn-group" data-toggle="buttons-radio">
               <button data-target="#tracks" data-toggle="tab" type="button" class="grid btn btn-primary active"><i class="icon-th-large icon-white"></i> Grid View</button>
               <button data-target="#search" data-toggle="tab" type="button" class="btn btn-primary"><i class="icon-th-list"></i> List View</button>
-              <button type="button" class="btn btn-primary"><i class="icon-cog"></i> Settings</button>
+              <button data-target="#settings" data-toggle="tab" type="button" class="btn btn-primary"><i class="icon-cog"></i> Settings</button>
             </div>
-            <button type="button" class="btn btn-success"><strong>Invite</strong></button>
+            <button type="button" class="invite btn btn-success"><strong>Invite</strong></button>
         </div>        
       </div>
 
@@ -82,14 +82,14 @@
       <!-- Tablet, Desktop and Landscape Phone: -->
       <form class="lsPhone form-search">
         <div class="input-append">
-          <input type="text" id="normSearchField" class="search-query" placeholder="Search...">
-          <button type="submit" id="normSearchBtn" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
+          <input id="normSearchField" type="text" class="search-query" placeholder="Search...">
+          <button id="normSearchBtn" data-target="#search" type="button" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
         </div>
       </form>
         
       <!-- portrait phone: -->
       <div class="visible-phone porPhone porPhoneSearch">
-        <button type="button" id="phoneSearchBtn" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
+        <button id="phoneSearchBtn"  data-target="#search" type="button" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
       </div>
     </div>
 
@@ -97,19 +97,29 @@
 </template>
 
 
-<template name="tracks">
+<template name="tabs">
   <div class="tab-content">
     <div id ="tracks" class="tab-pane active">
-        {{#if APIsReady}}
-        {{#each items}}
-          {{> player}}
-        {{/each}}
-        {{/if}}
+      {{> tracks}}
+    </div>
+    <div id="list" class="tab-pane">
+      <strong>List: coming soon...</strong>
+    </div>
+    <div id="settings" class="tab-pane">
+      <strong>Settings: coming soon...</strong>
     </div>
     <div id="search" class="tab-pane">
-        This is where the search results go.
+      {{> search}}
     </div>
-  </div>
+</template>
+
+
+<template name="tracks">
+  {{#if APIsReady}}
+    {{#each items}}
+      {{> player}}
+    {{/each}}
+  {{/if}}
 </template>
 
 
@@ -132,6 +142,62 @@
       {{/constant}}
     </div>
   </div>
+</template>
+
+
+<template name="search">
+  {{#if searching}}
+    <div style="text-align: center; margin: 10px 0 20px 0;"><span class="badge badge-important">Search Results</span></div>
+
+    <!-- YouTube -->
+    <div class="APIlogo"><a href="http://www.youtube.com"><img src="/YtLogo.png" width="95" height="40" alt="Youtube Logo"></a></div>
+    <div class = "results">
+      {{#if ytSearchComplete}}
+        {{#if noYtSearchError}}
+          {{#each ytResults}}
+            <div class="span-custom">
+              <p>{{artist}}</p>
+              <p><strong>{{title}}</strong></p>
+              <p><img src="{{pic}}"></p>
+              <button class="btn btn-success">Add</button>
+              <button class="btn btn-warning">Select</button>
+            </div>
+          {{/each}}
+        {{else}}
+          <span class="label label-inverse">SEARCH ERROR</span>
+          {{ytErrorMsg}}
+        {{/if}}
+      {{else}}
+        <span class="label label-info">Loading...</span>
+      {{/if}}
+    </div>
+    <div class = "btn-toolbar">
+      <div class="btn-group">
+        <button id="ytPrev" class="btn btn-danger {{disableYtPrev}}">Prev</button>
+        <button id="ytNext" class="btn btn-danger {{disableYtNext}}">Next</button>
+      </div>
+      <button class="{{hideMultSel}} btn btn-success">Add Selection</button>
+      <button class="btn">Cancel</button>
+    </div>
+
+    <!-- SoundCloud -->
+    <div class="APIlogo"><a href="http://www.soundcloud.com"><img src="/ScLogo.png" width="64" height="43" alt="Youtube Logo"></a></div>
+    <div class = "results">
+      <div class="span-custom"> Result </div>
+      <div class="span-custom"> Result </div>
+      <div class="span-custom"> Result </div>
+      <div class="span-custom"> Result </div>
+      <div class="span-custom"> Result </div>
+    </div>
+    <div class = "btn-toolbar">
+      <div class="btn-group">
+        <button class="btn btn-danger {{disablePrev}}">Prev</button>
+        <button class="btn btn-danger {{disableNext}}">Next</button>
+      </div>
+      <button class="{{hideMultSel}} btn btn-success">Add Selection</button>
+      <button class="btn">Cancel</button>
+    </div>
+  {{/if}}
 </template>
 
 
@@ -167,4 +233,3 @@
     </div>
   </div>
 </template>
-
