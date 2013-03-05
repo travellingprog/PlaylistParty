@@ -4,8 +4,6 @@
 var testList = "c3dfdf09-a554-4f25-a100-4283bfe81fea";
 
 Meteor.subscribe("playlist", testList);
-
-Session.set("itemsLoaded", false);
 Meteor.subscribe("items", testList); 
 
 
@@ -240,7 +238,6 @@ Template.player.events({
 
 Session.set("playing", false);
 Session.set("volume", 80);
-Session.set("mute", false);
 Session.set("curTime", 0);
 Session.set("totalTime", 0);
 Session.set("shuffle", false);
@@ -909,11 +906,11 @@ Meteor.startup(function () {
   // });
 
   // Flash detection
-  if (swfobject.hasFlashPlayerVersion("10.0.22")) {
-    Session.set("hasFlash", true);
-  }
-  else {
-    Session.set("hasFlash", false);
-  }
+  // if (swfobject.hasFlashPlayerVersion("10.0.22")) {
+  //   Session.set("hasFlash", true);
+  // }
+  // else {
+  //   Session.set("hasFlash", false);
+  // }
 
 });
