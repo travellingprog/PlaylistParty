@@ -12,7 +12,7 @@ Meteor.subscribe("items", testList);
 ///////////////////////////////////////////////////////////////////////////////
 // Player Object
 
-var player = Object();
+var player = {};
 var curPlayer;
 
 var Player = function(embedPlayer, userID, id) {
@@ -121,12 +121,6 @@ var goToNextPlayer = function () {
 ///////////////////////////////////////////////////////////////////////////////
 // Header template
 
-var normSearch = function() {
-  $('#normSearchBtn').tab('show');
-  mediaSearch($('#normSearchField').val());
-  $('#normSearchField').val("");
-};
-
 Template.header.playlistName = function() {
   var thisList = Playlist.findOne(testList);
   if (thisList === undefined) return "Welcome";
@@ -142,6 +136,15 @@ Template.header.loopStatus = function () {
 };
 
 Template.header.events({
+  'click a.tabLink' : function(e) {
+    // disable this link, open the corresponding tab
+    $(e.target.parentElement).addClass('disabled')
+                             .siblings().removeClass('disabled');
+    $('#phoneMenuDD').dropdown('toggle');  // menu stays open without this
+    $('#deskMenu .btn[data-target="' + e.target.dataset.target + '"]').click();
+    return false;
+  },
+
   'click .shuffle' : function() {
     Session.set("shuffle", ! Session.get("shuffle"));
     return false;
@@ -153,12 +156,11 @@ Template.header.events({
     return false;
   },
 
-  'click button.grid' : function(event) {
-    scrollToCurPlayer();
-  },
-
-  'click .invite' : function () {
-    Session.set("searching", ! Session.get("searching"));
+  'click button[data-toggle="tab"]' : function(e) {
+    // disable corresponding link in phone menu
+    $('a.tabLink[data-target="' + e.target.dataset.target + '"]')
+      .parent().addClass('disabled')
+      .siblings().removeClass('disabled');
   },
 
   'keypress #normSearchField' : function(event) {
@@ -170,6 +172,10 @@ Template.header.events({
 
   'click #normSearchBtn' : function() {
     normSearch();
+  },
+
+  'click #phoneSearchBtn' : function() {
+    Session.set("showPhoneSearch", true);
   }
 });
 
@@ -353,7 +359,7 @@ setNewVolume = function (volume) {
 };
 
 updateVolTooltip = function (volume) {
-  var phoneVol = $("#phoneVol")
+  var phoneVol = $("#phoneVol");
   phoneVol.tooltip('destroy');
   phoneVol.tooltip({title: (Math.round(volume)).toString() });
   phoneVol.tooltip('show');
@@ -441,16 +447,34 @@ Template.controls.events({
 
 ///////////////////////////////////////////////////////////////////////////////
 // Search template
-Session.set("searching", false);
-Session.set("ytSearchComplete", false);
+Session.set("query", "");
 Session.set("ytSearchIndex", 0);
+Session.set("scSearchIndex", 0);
+Session.set("selection", new Array());
 var ytResult = new Array();
 var scResult = new Array();
-var ytSearchError;
+var ytSearchError, scSearchError;
+var logoPos = 0;
 
+var normSearch = function() {
+  $('#normSearchBtn').tab('show');
+  mediaSearch($('#normSearchField').val());
+  $('#normSearchField').val("");
+};
 
 
 var mediaSearch = function (query) {
+  Session.set("query", query);
+  Session.set("ytSearchComplete", false);
+  Session.set("scSearchComplete", false);
+  Session.set("ytSearchIndex", 0);
+  Session.set("scSearchIndex", 0);
+  Session.set("selection", new Array());
+  ytResult = new Array();
+  scResult = new Array();
+  ytSearchError = null;
+  scSearchError = null;
+  logoPos = 0;
   Session.set("searching", true);
   ytSearch(query);  // Youtube
   scSearch(query);  // SoundCloud
@@ -460,7 +484,7 @@ var mediaSearch = function (query) {
 
 var ytSearch = function (query) {
   var searchURL = "https://www.googleapis.com/youtube/v3/search";
-  var param = Object();
+  var param = {};
   param["q"] = '"' + query + '"';
   param["type"] = "video";
   param["key"] = "AIzaSyC9NItPbDx4SdF3DQJn-5dT2fL1qtNACKI";
@@ -471,10 +495,10 @@ var ytSearch = function (query) {
   param["fields"] += "snippet(title, thumbnails/default/url))";
 
   Meteor.http.get(searchURL, {params: param}, function (error, result)  {
-    Session.set("ytSearchComplete", true);
     
+    Session.set("ytSearchComplete", true);
     if (error) {
-      ytSearchError = error;
+      ytSearchError = result.data.error.message;
       return;
     }
 
@@ -494,10 +518,12 @@ var ytSearch = function (query) {
       }
 
       ytResult[i] = {
-        "artist" : artist,
-        "title" : title,
-        "pic" : item.snippet.thumbnails.default.url,
-        "streamID" : item.id.videoId
+        "artist": artist,
+        "title": title,
+        "pic": item.snippet.thumbnails.default.url,
+        "streamID": item.id.videoId,
+        "type": "YouTube",
+        "selected": ""
       };
     }
   });
@@ -505,52 +531,34 @@ var ytSearch = function (query) {
 
 
 var scSearch = function (query) {
-  var param = Object();
+  var param = {};
   param["q"] = query;
   param["order"] = "hotness";
   param["filter"] = "public, streamable";
 
   SC.get('/tracks', param, function(resp, error) {
-    if (error) 
+    
+    Session.set("scSearchComplete", true);
+    if (error) {
+      scSearchError = error;
+      return;
+    }
 
     var scCount = resp.length;
+    var item;
 
     for (var i=0; i < scCount; i++) {
       item = resp[i];
       scResult[i] = {
         "artist" : item.user.username,
         "title" : item.title,
+        "duration" : showTime(Math.floor(item.duration / 1000)),
         "pic" : (item.artwork_url) ? item.artwork_url : item.waveform_url,
-        "streamID": item.permalink_url                                          
+        "streamID": item.permalink_url,
+        "type": "SoundCloud",
+        "selected": ""
       };
     }
-  });
-};
-
-
-var addURL = function(url) {
-  if (url == "") return;
-  var mediaID, type;
-
-  if (url.search("youtube") !== -1) {
-    mediaID = getYoutubeID(url);
-    type = "YouTube";
-  } else if (url.search("soundcloud") !== -1) {
-    mediaID = url;
-    type = "SoundCloud";
-  } else {
-    return;
-  }
-
-  var newSeqNo = Math.floor(Items.findOne({},{sort: {seqNo: -1}}).seqNo + 1);
-
-  Items.insert({
-    "playlistID" : testList, 
-    "type" : type, 
-    "streamID" : mediaID,
-    "title": "Item title",
-    "seqNo" : newSeqNo + "." + (new Date()).getTime(), 
-    "addedBy" : "user1"
   });
 };
 
@@ -558,6 +566,10 @@ var addURL = function(url) {
 Template.search.searching = function() {
   return Session.get("searching");
 };
+
+Template.search.query = function () {
+  return Session.get("query");
+}
 
 Template.search.ytSearchComplete = function() {
   return Session.get("ytSearchComplete");
@@ -576,31 +588,258 @@ Template.search.ytResults = function () {
 };
 
 Template.search.ytErrorMsg = function() {
-  return "Youtube has reported an error";
+  return ytSearchError;
 };
 
 Template.search.disableYtPrev = function () {
   if (Session.get("ytSearchIndex") === 0) return "disabled";
   return "";
-}
+};
 
 Template.search.disableYtNext = function () {
   if ((Session.get("ytSearchIndex") + 5) >= ytResult.length) return "disabled";
   return "";
-}
+};
+
+Template.search.scSearchComplete = function() {
+  return Session.get("scSearchComplete");
+};
+
+Template.search.noScSearchError = function () {
+  return (! scSearchError);
+};
+
+Template.search.scResults = function () {
+  if (scResult.length === 0) return;
+  var startIndex = Session.get("scSearchIndex");
+  var endIndex = startIndex + 5;
+  if (scResult.length < endIndex) endIndex = ytResult.length;
+  return scResult.slice(startIndex, endIndex);
+};
+
+Template.search.scErrorMsg = function() {
+  return scSearchError.message;
+};
+
+Template.search.disableScPrev = function () {
+  if (Session.get("scSearchIndex") === 0) return "disabled";
+  return "";
+};
+
+Template.search.disableScNext = function () {
+  if ((Session.get("scSearchIndex") + 5) >= scResult.length) return "disabled";
+  return "";
+};
+
+Template.search.SelectOrUnselect = function() {
+  if (this.selected === "") return "Select";
+  return "Unselect";
+};
+
+Template.search.hideAdd = function () {
+  if (Session.get("selection").length !== 0) return "hidden";
+  return "";
+};
+
+Template.search.hideMultSel = function () {
+  if (Session.get("selection").length === 0) return "hidden";
+  return "";
+};
+
+Template.search.selNum = function() {
+  return Session.get("selection").length;
+};
 
 
 Template.search.events({
-  'click #ytPrev' : function() {
+  'click #ytPrev' : function(e) {
     if (Session.get("ytSearchIndex") === 0) return;
     Session.set("ytSearchIndex", Session.get("ytSearchIndex") - 5);
+    logoPos = $(e.target).closest('.btn-toolbar').siblings('.APIlogo')
+                  .offset().top;
+    logoPos -= $('#searchTop').offset().top;
+    $('html, body').scrollTop(logoPos);
   },
 
-  'click #ytNext' : function() {
+  'click #ytNext' : function(e) {
     if ((Session.get("ytSearchIndex") + 5) >= ytResult.length) return;
     Session.set("ytSearchIndex", Session.get("ytSearchIndex") + 5);
+    logoPos = $(e.target).closest('.btn-toolbar').siblings('.APIlogo')
+                  .offset().top;
+    logoPos -= $('#searchTop').offset().top;
+    $('html, body').scrollTop(logoPos);
+  },
+
+  'click #scPrev' : function(e) {
+    if (Session.get("scSearchIndex") === 0) return;
+    Session.set("scSearchIndex", Session.get("scSearchIndex") - 5);
+    logoPos = $(e.target).closest('.btn-toolbar').siblings('.APIlogo')
+                  .offset().top;
+    logoPos -= $('#searchTop').offset().top;
+    $('html, body').scrollTop(logoPos);
+  },
+
+  'click #scNext' : function(e) {
+    if ((Session.get("scSearchIndex") + 5) >= scResult.length) return;
+    Session.set("scSearchIndex", Session.get("scSearchIndex") + 5);
+    logoPos = $(e.target).closest('.btn-toolbar').siblings('.APIlogo')
+                  .offset().top;
+    logoPos -= $('#searchTop').offset().top;
+    $('html, body').scrollTop(logoPos);
+  },
+
+  'click .addItem' : function() {
+
+    var newSeqNo;
+    if (! Items.findOne({})) {
+      newSeqNo = 1;
+    } else {
+      newSeqNo = parseInt(Items.findOne({},{sort: {seqNo: -1}}).seqNo) + 1;
+    }
+
+    Items.insert({
+      "playlistID" : testList, 
+      "type" : this.type, 
+      "streamID" : this.streamID,
+      "artist": this.artist,
+      "title": this.title,
+      "seqNo" : parseFloat(newSeqNo + "." + (new Date()).getTime()), 
+      "addedBy" : "user1"
+    });
+
+    $('#deskMenu .active').tab("show");
+    Session.set("searching", false);
+    Session.set("query", "");
+    Session.set("ytSearchComplete", false);
+    Session.set("scSearchComplete", false);
+    Session.set("ytSearchIndex", 0);
+    Session.set("scSearchIndex", 0);
+    Session.set("selection", new Array());
+    ytResult = new Array();
+    scResult = new Array();
+    ytSearchError = null;
+    scSearchError = null;
+    logoPos = 0;
+  },
+
+  'click .selectItem' : function(e) {
+    var selection = Session.get("selection");
+
+    if (this.selected === "") 
+    {
+      this.selected = "selected";  
+      selection.push(this);
+      $(e.target.parentElement).addClass("selected");
+      $(e.target).text("Unselect");
+    } 
+    else 
+    {
+      for (i=0, l=selection.length; i < l; i++) {
+        if (selection[i].streamID === this.streamID) {
+          selection.splice(i, 1);
+          break;
+        }
+      }      
+      this.selected = "";      
+      $(e.target.parentElement).removeClass("selected");
+      $(e.target).text("Select");
+    }
+
+    Session.set("selection", selection);
+  },
+
+  'click .addSelection' : function() {
+    var selection = Session.get("selection");
+    var selLength = selection.length;
+
+    var newSeqNo;
+    if (! Items.findOne({})) {
+      newSeqNo = 1;
+    } else {
+      newSeqNo = parseInt(Items.findOne({},{sort: {seqNo: -1}}).seqNo) + 1;
+    }
+    
+    for (i = 0; i < selLength; i++){
+      
+      Items.insert({
+        "playlistID" : testList, 
+        "type" : selection[i].type, 
+        "streamID" : selection[i].streamID,
+        "artist": selection[i].artist,
+        "title": selection[i].title,
+        "seqNo" : parseFloat(newSeqNo + "." + (new Date()).getTime()), 
+        "addedBy" : "user1"
+      });
+      newSeqNo++;
+    }
+
+    $('#deskMenu .active').tab("show");
+    Session.set("searching", false);
+    Session.set("query", "");
+    Session.set("ytSearchComplete", false);
+    Session.set("scSearchComplete", false);
+    Session.set("ytSearchIndex", 0);
+    Session.set("scSearchIndex", 0);
+    Session.set("selection", new Array());
+    ytResult = new Array();
+    scResult = new Array();
+    ytSearchError = null;
+    scSearchError = null;
+    logoPos = 0;
+  },
+
+  'click .cancel': function() {
+    $('#deskMenu .active').tab("show");
+    Session.set("searching", false);
+    Session.set("query", "");
+    Session.set("ytSearchComplete", false);
+    Session.set("scSearchComplete", false);
+    Session.set("ytSearchIndex", 0);
+    Session.set("scSearchIndex", 0);
+    Session.set("selection", new Array());
+    ytResult = new Array();
+    scResult = new Array();
+    ytSearchError = null;
+    scSearchError = null;
+    logoPos = 0;
   }
 });
+
+
+///////////////////////////////////////////////////////////////////////////////
+// phoneSearch template
+
+Template.page.showPhoneSearch = function() {
+  return Session.get("showPhoneSearch");
+};
+
+var phoneSearch = function() {
+  Session.set("showPhoneSearch", false);
+  $('#normSearchBtn').tab('show');
+  mediaSearch($('#phoneSearchField').val());
+  $('#phoneSearchField').val("");
+};
+
+Template.phoneSearch.events({
+  'keypress #phoneSearchField' : function(event) {
+    if (event.which == 13) {
+      phoneSearch();
+    }
+  },
+
+  'click #phoneSearchBtn2' : function() {
+    phoneSearch();
+  },
+
+  'click .cancel' : function() {
+    Session.set("showPhoneSearch", false);
+  }
+});
+
+Template.phoneSearch.rendered = function() {
+  $('#phoneSearchField').focus();
+};
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -661,8 +900,13 @@ Meteor.startup(function () {
   // phoneVol tooltip
   $("#phoneVol").tooltip({
     title: (Session.get("volume")).toString(), 
-    delay: 500
+    delay: 500,
   });
+
+  // tab behaviour
+  // $('body').on('shown', '#deskMenu button[data-toggle="tab"]', function(e) {
+  //   alert(e.target.dataset.target);
+  // });
 
   // Flash detection
   if (swfobject.hasFlashPlayerVersion("10.0.22")) {
