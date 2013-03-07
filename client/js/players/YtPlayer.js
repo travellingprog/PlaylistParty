@@ -1,5 +1,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 // YouTube API loading
+//
+// Global variables defined here:
+// - loadYTplayerAPI function
+// - onYouTubeIframeAPIReady function
+// - onPlayerReady function
+// - onPlayerStateChange function
+// - YtPlayer object
+// 
+// Global variables used:
+// - player array
+// - curPlayer
+// - boombox
+// - setCurPlayer function
+// - goToNextPlayer function
+
+
 
 // load the YouTube IFrame Player API code
 var loadYTplayerAPI = function () {
@@ -30,7 +46,7 @@ var onYouTubeIframeAPIReady = function () {
 
 var YtPlayer = function(id, streamID) {
 
-  var ytplayer = new YT.Player(id, {
+  this.ytplayer = new YT.Player(id, {
     height: '200',
     width: '232',
     videoId: streamID,
@@ -39,38 +55,51 @@ var YtPlayer = function(id, streamID) {
       'onStateChange': onPlayerStateChange
     }
   });
+};
 
-  this.play = function () {
-    ytplayer.playVideo();
+
+YtPlayer.prototype.play = function () {
+  this.ytplayer.playVideo();
+};
+ 
+
+YtPlayer.prototype.pause = function () {
+  this.ytplayer.pauseVideo();
+};
+
+
+YtPlayer.prototype.setVolume = function (newVolume) {
+  if (this.ytplayer.setVolume) {
+    this.ytplayer.setVolume(newVolume);  
   }
-  
-  this.pause = function () {
-    ytplayer.pauseVideo();
-  }
-  
-  this.setVolume = function (newVolume) {
-    if (typeof ytplayer.setVolume === 'function') {
-      ytplayer.setVolume(newVolume);  
+};
+
+
+YtPlayer.prototype.updateVolume = function () {
+  if (this.ytplayer.getVolume) {
+    var newVolume = this.ytplayer.getVolume();
+    if (newVolume != boombox.getVolume()) {
+      boombox.setVolume(newVolume);
     }
   }
+};
 
-  this.updateVolume = function () {
-    var newVolume = ytplayer.getVolume();
-    if (newVolume != Session.get("volume")) {
-      Session.set("volume", ytplayer.getVolume());
-    }
-  }
-  
-  this.setNewTime = function (newTime) {
-    ytplayer.seekTo(newTime, true);
-  }
 
-  this.updateCurrentTime = function() {
-    Session.set("curTime", Math.ceil(ytplayer.getCurrentTime()) );
-  }
+YtPlayer.prototype.setNewTime = function (newTime) {
+  this.ytplayer.seekTo(newTime, true);
+};
 
-  this.updateDuration = function() {
-    Session.set("totalTime", Math.floor(ytplayer.getDuration()) );
+
+YtPlayer.prototype.updateCurrentTime = function() {
+  if (this.ytplayer.getCurrentTime) {
+    boombox.setCurTime( Math.ceil(this.ytplayer.getCurrentTime()) );  
+  }
+};
+
+
+YtPlayer.prototype.updateDuration = function() {
+  if (this.ytplayer.getDuration) {
+    boombox.setTotalTime( Math.floor(this.ytplayer.getDuration()) );  
   }
 };
 
@@ -79,8 +108,7 @@ var YtPlayer = function(id, streamID) {
 var onPlayerReady = function(event) {
   // cue video
   var id = event.target.getIframe().getAttribute("id");
-  var thisPlayer = player[id];
-  thisPlayer.setVolume(Session.get("volume"));
+  player[id].setVolume(boombox.getVolume());
 };
 
 
@@ -92,19 +120,19 @@ var onPlayerStateChange = function(event) {
 
   if (newState === state.PLAYING) {
     if (curPlayer !== player[id]) setCurPlayer(id);
-    Session.set("playing", true);
+    boombox.setPlaying(true);
     return;
   }
 
   if (curPlayer !== player[id]) return;
 
   if (newState === state.PAUSED) {
-    Session.set("playing", false);
+    boombox.setPlaying(false);
   }
 
   if (newState === state.ENDED) {
     // because Pause state is called right before Ended...
-    Session.set("playing", true);
+    boombox.setPlaying(true);
     // ... then ...
     goToNextPlayer();
   }
@@ -118,37 +146,6 @@ var onPlayerStateChange = function(event) {
 
 var getYoutubeID = function(vidURL) {
   var idRegex = /(v=)([\w-]*)/;
-  idMatch = vidURL.match(idRegex);
+  var idMatch = vidURL.match(idRegex);
   return idMatch ? idMatch[2] : "";
 };
-
-
-
-  // function volumeToYT(volume) {
-  //   // set a volume value on the YouTube player so that its volume slider 
-  //   // control looks like our volume slider control
-
-  //   var YTvolume;
-  //   if (Session.get("hasFlash")) {
-  //     YTvolume = Math.round( Math.pow((0.1029010817 * volume), 1.9802909245) );
-  //     if (YTvolume > 100) YTvolume = 100;
-  //   } else {
-  //     YTvolume = volume;
-  //   }
-  //   return YTvolume;
-  // }
-
-
-  // function volFromYT(YTvolume) {
-  //   // return a volume value that reflects the position of the volume slider 
-  //   // control on the embedded YouTube video player.
-
-  //   var volume;
-  //   if (Session.get("hasFlash")) {
-  //     volume = Math.round( 9.7245712923 * Math.pow(YTvolume, 0.5049763081) );
-  //     if (volume > 100) volume = 100;
-  //   } else {
-  //     volume = Math.round(YTvolume);
-  //   }
-  //   return volume;
-  // }

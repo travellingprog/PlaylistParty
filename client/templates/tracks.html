@@ -1,0 +1,9 @@
+<template name="tracks">
+
+  {{#if APIsReady}}
+    {{#each items}}
+      {{> player}}
+    {{/each}}
+  {{/if}}
+  
+</template>

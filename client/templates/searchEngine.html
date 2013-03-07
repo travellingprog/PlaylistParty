@@ -1,0 +1,36 @@
+<template name="searchEngine">
+
+  <div class="searchEngine">
+    <div id="logo{{name}}" class="APIlogo"><a href="{{homepage}}">{{{logoImage}}}</a></div>
+    <div class="results">
+      {{#if searchComplete}}
+        {{#if noSearchError}}
+          {{#each result}}
+            <div class="span-custom">
+              <div class="singleResult {{selected}}">
+                {{{description}}}
+                <p><img src="{{pic}}"></p>
+                <button class="{{hideAdd}} addItem btn btn-success">Add</button>
+                <button class="selectItem btn btn-warning">{{SelectOrUnselect}}</button>
+              </div>
+            </div>
+          {{/each}}
+        {{else}}
+          <span class="label label-inverse">SEARCH ERROR</span>
+          {{errorMsg}}
+        {{/if}}
+      {{else}}
+        <span class="label label-info">Loading...</span>
+      {{/if}}
+    </div>
+    <div class = "btn-toolbar">
+      <div class="btn-group">
+        <button class="prev btn btn-danger {{disablePrev}}">Prev</button>
+        <button class="next btn btn-danger {{disableNext}}">Next</button>
+      </div>
+      <button class="addSelection {{hideMultSel}} btn btn-success">Add Selection ({{selNum}})</button>
+      <button class="btn cancel">Cancel</button>
+    </div>
+  </div>
+
+</template>

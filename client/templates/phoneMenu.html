@@ -1,0 +1,24 @@
+<template name="phoneMenu">
+
+  <div class="visible-phone phoneMenu">
+    <div class="btn-group">
+      <a class="btn dropdown-toggle btn-primary" data-toggle="dropdown" href="/"><span class="caret"></span> Menu</a>
+
+      <ul id="phoneMenuDD" class="dropdown-menu">
+        <li class="disabled"><a data-target="#tracks" href="/" class="tabLink"><i class="icon-th-large"></i> Grid View </a></li>
+        <li><a data-target="#list" href="/" class="tabLink"><i class="icon-th-list"></i> List View </a></li>
+        <li><a data-target="#settings" href="/" class="tabLink"><i class="icon-cog"></i> Settings </a></li>
+        
+        <!-- Portrait Phone options only: -->
+        <li class="porPhone"><a href="/"><span class="label label-success"><i class="icon-envelope icon-white"></i>  INVITE</span></a></li>
+        <li class="porPhone divider"></li>
+        <li class="porPhone"><a class="shuffle" href="/"><i class="icon-random"></i> Shuffle ({{shuffleStatus}})</a></li>
+        <li class="porPhone"><a class="loop" href="/"><i class="icon-repeat"></i> Loop ({{loopStatus}})</a></li>
+      </ul>
+    </div>
+
+    <!-- landscape phone button only: -->
+    <button type="button" class="lsPhone btn btn-success"><strong>Invite</strong></button>
+  </div>
+
+</template>

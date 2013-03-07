@@ -1,0 +1,23 @@
+<template name="player">
+
+  <div class="span-custom">
+    <div class ="player {{isCurrent}}">
+      <span class="badge badge-inverse">{{trackNo}}</span><br>
+      {{artist}}<br>
+      <strong>{{title}}</strong>
+      {{#constant}}
+      <div id="{{_id}}"></div>
+      {{/constant}}
+      <div class="player-bottom">
+        added by <span class="userID">{{addedBy}}</span><br>
+        {{#if myItem}}
+          <button type="button" class="remItem btn btn-link">remove</button>
+        {{else}}
+          <button type="button" class="btn btn-mini btn-success" style="float: left"><i class="icon-thumbs-up icon-white"></i> Nice!</button>
+          <p class="text-right">0 <i class="icon-thumbs-up"></i></p>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+  
+</template>

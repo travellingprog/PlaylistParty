@@ -1,0 +1,57 @@
+<template name="controls">
+
+  <div id="footer">    
+
+    <div id="controlbox" class="{{isHidden}}">
+
+      <!-- Time and Track Indicators -->
+      {{#constant}}
+      <div id="timeslider"></div>
+      {{/constant}}
+
+      {{#isolate}}
+      <span id="timeIndicator">{{curTime}} / {{totalTime}} </span> 
+      {{/isolate}}
+      
+      <p id="trackIndicator" class="text-right">{{curTrack}} of {{numTracks}}</p>
+
+      <div id="bottom-controls">
+        <!-- Minimize Controls -->
+        <button id="minControls" type="button" class="btn btn-link btn-mini"><i class="icon-chevron-down"></i></button>
+        
+
+        <!-- LS Phone, Tablet, Desktop: Shuffle, Loop -->
+        <button type="button" class="shuffle lsPhone btn btn-link btn-mini"><img src="{{shufflePic}}" width="16" height="14"></img></button>
+        <button type="button" class="loop lsPhone btn btn-link btn-mini"><img src="{{loopPic}}" width="14" height="14"></i></button>
+
+        
+        <!-- Prev, Play, Next -->
+        <button id="prev" type="button" class="btn btn-danger"><img src="/Prev.png" width="16" height="14"></button>
+        <button id="play" type="button" class="btn btn-danger"><img src="{{playOrPause}}" width="21" height="21"></button>
+        <button id="next" type="button" class="btn btn-danger"><img src="/Next.png" width="16" height="14"></button>
+        
+        
+        <!-- LS Phone, Tablet, Desktop: Volume -->
+        <button id="minVolume" type="button" class="lsPhone btn btn-link btn-mini"><i class="icon-volume-off"></i></button>
+        {{#constant}}
+        <div id="volumeslider" class ="lsPhone"></div>
+        {{/constant}}
+        <button id="maxVolume" type="button" class="lsPhone btn btn-link btn-mini"><i class="icon-volume-up"></i></button>
+
+        
+        <!-- Portrait Phone: Volume -->
+        <div id ="phoneVol" class="visible-phone porPhone btn-group">
+          <button id="volumeDown" type="button" class="btn btn-danger"><i class="icon-volume-down icon-white"></i></button>
+          <button id="volumeUp" type="button" class="btn btn-danger"><i class="icon-volume-up icon-white"></i></button>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="controlbox-minimized" class="{{showMinimize}}">
+      <button id="openControls" type="button" class="btn btn-link btn-small"><i class="icon-chevron-up"></i></button>
+    </div>
+
+  </div>
+
+</template>

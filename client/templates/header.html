@@ -1,0 +1,43 @@
+<template name="header">
+  <div id="header">
+
+    <!-- Left -->
+    <div class="left">
+
+      <!-- Tablet and Desktop: Logo -->
+      <div class="hidden-phone logo">
+        <img src="/LargeLogo.png" width="190" height="74" alt="logo">
+      </div>
+
+      <!-- Phone: Menu -->
+      {{> phoneMenu}}
+
+    </div>
+
+
+    <!-- Middle -->
+    <div class="middle">
+      
+      <!-- Tablet and Desktop: Playlist Name and Menu-->
+      <div class="hidden-phone">
+        <div class="playlistName">
+          <h3>{{playlistName}}</h3>
+        </div>
+
+        {{> deskMenu}}
+      </div>
+
+      <!-- Phone: Logo -->
+      <div class="visible-phone logo">
+        <img src="/SmallLogo2.png" width="50" height="50" alt="logo">
+      </div>
+    </div>
+
+
+    <!-- Right: Search -->
+    <div class="right">
+      {{> searchBox}}  
+    </div>
+
+  </div>
+</template>

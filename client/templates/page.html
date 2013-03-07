@@ -1,0 +1,11 @@
+<template name="page">
+  {{#isolate}}
+    {{#if showPhoneSearch}}
+      {{> phoneSearchBox}}
+    {{/if}}
+  {{/isolate}}
+
+  {{> header}}
+  {{> tabs}}
+  {{> controls}}
+</template>
