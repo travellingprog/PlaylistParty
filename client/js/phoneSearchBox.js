@@ -1,5 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // phoneSearchBox
+//
+// Global varibles used here:
+// - Session.keys.showPhoneSearch
+
 
 (function() {
 
@@ -10,8 +14,8 @@
   };
   
   template.search = function() {
-    Session.set("showPhoneSearch", false);
-    Template.search.start('#phoneSearchField'); 
+    Template.search.start('#phoneSearchField');
+    Session.set("showPhoneSearch", false); 
   };
   
   template.events({
@@ -25,7 +29,7 @@
       template.search();
     },
   
-    'click #phoneSearchCancel' : function() {
+    'click .cancel' : function() {
       Session.set("showPhoneSearch", false);
     }
   });

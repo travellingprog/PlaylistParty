@@ -148,14 +148,14 @@
     'click .prev' : function() {
       if (this.engine.index() === 0) return;
       this.engine.setIndex(this.engine.index() - 5);
-      scrollToLogo();
+      scrollToLogo(this.name);
     },
 
 
     'click .next' : function() {
       if ( (this.engine.index() + 5) >= this.engine.results.length ) return;
       this.engine.setIndex(this.engine.index() + 5);
-      scrollToLogo();
+      scrollToLogo(this.name);
     },
 
 
@@ -206,8 +206,8 @@
   });
 
 
-  var scrollToLogo = function() {
-      var logoPos = $('#logo' + this.name).offset().top;
+  var scrollToLogo = function(name) {
+      var logoPos = $('#logo' + name).offset().top;
       var topPos = $('#searchTop').offset().top;
       $('html, body').scrollTop(logoPos - topPos);
   };

@@ -170,7 +170,7 @@
     // remove any previous search results
     Session.set("searching", false);
     Meteor.flush();
-    // Template.searchEngine.reset();
+    Template.searchEngine.reset();
 
     // start the search engines
     this.query = $(queryField).val();

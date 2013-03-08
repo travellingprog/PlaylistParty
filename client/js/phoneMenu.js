@@ -1,5 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
-// phoneMenu template
+// phoneMenu
+//
+// Global variables used here:
+// - boombox
+
+
 
 (function() {
 
@@ -10,12 +15,12 @@
   };
 
   template.shuffleStatus = function () {
-    return Session.get("shuffle") ? "ON" : "off";     // maybe change
+    return boombox.onShuffle() ? "ON" : "off";
   };
 
 
   template.loopStatus = function () {
-    return Session.get("loop") ? "ON" : "off";        // maybe change
+    return boombox.onLoop() ? "ON" : "off";
   };
 
 
@@ -34,13 +39,15 @@
 
 
     'click .shuffle' : function() {
-      Session.set("shuffle", ! Session.get("shuffle")); // maybe change
+      boombox.toggleShuffle();
+      $('#phoneMenuDD').dropdown('toggle');
       return false;
     },
 
 
     'click .loop' : function() {
-      Session.set("loop", ! Session.get("loop")); // maybe change
+      boombox.toggleLoop();
+      $('#phoneMenuDD').dropdown('toggle');
       return false;
     }
   });

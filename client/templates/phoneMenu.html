@@ -12,8 +12,10 @@
         <!-- Portrait Phone options only: -->
         <li class="porPhone"><a href="/"><span class="label label-success"><i class="icon-envelope icon-white"></i>  INVITE</span></a></li>
         <li class="porPhone divider"></li>
+        {{#isolate}}
         <li class="porPhone"><a class="shuffle" href="/"><i class="icon-random"></i> Shuffle ({{shuffleStatus}})</a></li>
         <li class="porPhone"><a class="loop" href="/"><i class="icon-repeat"></i> Loop ({{loopStatus}})</a></li>
+        {{/isolate}}
       </ul>
     </div>
 
