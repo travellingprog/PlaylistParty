@@ -10,7 +10,11 @@
       </div>
 
       <!-- Phone: Menu -->
-      {{> phoneMenu}}
+      {{#if playlistSet}}
+        {{> phoneMenu}}
+      {{else}}
+        <div style="visibility:hidden">Empty space</div>
+      {{/if}}
 
     </div>
 
@@ -20,11 +24,15 @@
       
       <!-- Tablet and Desktop: Playlist Name and Menu-->
       <div class="hidden-phone">
-        <div class="playlistName">
-          <h3>{{playlistName}}</h3>
-        </div>
-
-        {{> deskMenu}}
+        {{#if playlistSet}}
+          <div class="playlistName">
+            <h3>{{playlistName}}</h3>
+          </div>
+        
+          {{> deskMenu}}
+        {{else}}
+          <div style="visibility:hidden">Empty space</div>
+        {{/if}}
       </div>
 
       <!-- Phone: Logo -->
@@ -36,7 +44,9 @@
 
     <!-- Right: Search -->
     <div class="right">
-      {{> searchBox}}  
+      {{#if playlistSet}}
+        {{> searchBox}}
+      {{/if}}
     </div>
 
   </div>

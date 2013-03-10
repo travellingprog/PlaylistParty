@@ -8,6 +8,11 @@
 
 (function() {
 
+  Template.tracks.playlistSet = function() {
+    return Session.get("playlistSet");
+  };
+  
+
   Template.tracks.APIsReady = function () {
     if (! Session.get("YtAPIready")) return false;
     if (! Session.get("ScAPIready")) return false;

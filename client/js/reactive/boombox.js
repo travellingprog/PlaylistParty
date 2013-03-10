@@ -23,7 +23,7 @@
     var totalTime = 0;
     var player = {};
     var curPlayer = false;
-    this.pauseUpdates = false;
+    this.pauseUpdates = true;
     var $timeslider, $volumeslider, $phoneVol;
     var that = this;
 
@@ -162,7 +162,10 @@
 
       this.addPlayer = function(newPlayer) {
         player[newPlayer.id] = newPlayer;
-        if (! (curPlayer) ) this.setCurPlayer(newPlayer.id);
+        if (! curPlayer) {
+          this.pauseUpdates = false;
+          this.setCurPlayer(newPlayer.id);
+        } 
       };
 
 
@@ -173,6 +176,10 @@
             //note: going to the next track will auto-pause the current one
           } else {
             curPlayer.pause();
+            curPlayer = false;
+            this.setCurTime(0);
+            this.setTotalTime(0);
+            this.pauseUpdates = true;
           }
         }
 
@@ -219,7 +226,8 @@
 
       function initiateTimeSlider () {
         $timeslider.slider({
-          range: "min", 
+          range: "min",
+          max: 0, 
           animate: true,
           start: function() { that.pauseUpdates = true; },
           slide: function(event, ui) { that.setCurTime(ui.value), 'sliding' },
@@ -314,8 +322,6 @@
         if (source !== 'slider') {
           $volumeslider.slider('value', newVolume);
         }
-
-
 
         volume = newVolume;
         this.changedData('volume');

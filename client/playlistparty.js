@@ -24,10 +24,26 @@
   ///////////////////////////////////////////////////////////////////////////////
   // Meteor Collection subscription
 
-  testList = "c3dfdf09-a554-4f25-a100-4283bfe81fea";
+  PlaylistParty = {};
 
-  Meteor.subscribe("playlist", testList);
-  Meteor.subscribe("items", testList); 
+  PlaylistParty.subscribe = function (playlistID) {
+
+    PlaylistParty.playlistHandle = Meteor.subscribe("playlist", playlistID, {
+      
+      'onReady': function() {
+        PlaylistParty.itemsHandle = Meteor.subscribe("items", playlistID);
+        PlaylistParty.playlistID = playlistID;
+        Session.set("playlistSet", true);
+        Session.set("showCreatePlaylist", false);
+      },
+
+      'onError': function(error) {
+        PlaylistParty.playlistHandle.stop();
+        Template.initialPage.errorMessage(error.reason);
+        Session.set('checkedURL', true);
+      }
+    });
+  };
 
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -102,16 +118,27 @@
   Meteor.startup(function () {
     
     window.scrollTo(0,0);
+    Session.set('playlistSet', false);
+
+    // Check the path name
+    var path = window.location.pathname;
+    path = path.match(/([a-z0-9]+)\/([a-z0-9]+)/);
+    if (path){
+      PlaylistParty.subscribe(path[0]);
+    } else {
+      Session.set('checkedURL', true);
+    }
+        
 
     // load the YouTube IFrame Player API code asynchronously
-    Session.set("YtAPIready", false);
+    Session.set('YtAPIready', false);
     loadYTplayerAPI();
 
     // Register with the SoundCloud API
     SC.initialize({
       client_id: '46952284e7dd10b148d9868c4ad74cdc'
     });
-    Session.set("ScAPIready", true);
+    Session.set('ScAPIready', true);
   });
 
   

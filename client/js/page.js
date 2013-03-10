@@ -11,5 +11,9 @@
     return Session.get("showPhoneSearch");
   };
 
+  Template.page.showCreatePlaylist = function () {
+    return Session.get("showCreatePlaylist");
+  };
+
 })();
 

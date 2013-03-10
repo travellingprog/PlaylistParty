@@ -8,9 +8,12 @@
 (function() {
 
   Template.header.playlistName = function() {
-    var thisList = Playlist.findOne(testList);
-    if (! thisList) return "Welcome";
+    var thisList = Playlist.findOne();
     return thisList.name;
+  };
+
+  Template.header.playlistSet  = function() {
+    return Session.get("playlistSet");
   };
 
 })();

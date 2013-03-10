@@ -224,13 +224,13 @@
 
   var insertItem = function(item, seqNo) {
     Items.insert({
-      "playlistID" : testList, 
+      "playlistID" : PlaylistParty.playlistID, 
       "type" : item.type, 
       "streamID" : item.streamID,
       "artist": item.artist,
       "title": item.title,
       "seqNo" : parseFloat(seqNo + "." + (new Date()).getTime()), 
-      "addedBy" : "user1"
+      "addedBy" : 'user1'
     });
   };
 
