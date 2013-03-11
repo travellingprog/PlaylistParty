@@ -3,6 +3,7 @@
 //
 // Global variables used here:
 // - boombox
+// - Session.keys.showInvite
 
 
 
@@ -35,6 +36,15 @@
 
       $('#deskMenu .btn[data-target="' + e.target.dataset.target + '"]').click();
       return false;
+    },
+
+    'click a.invite' : function() {
+      Session.set("showInvite", true);
+      return false;
+    },
+
+    'click button.invite' : function() {
+      Session.set("showInvite", true);
     },
 
 

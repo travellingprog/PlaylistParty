@@ -60,15 +60,45 @@ body {
 /* initial Page */
 
 #initialPage {
-  background-color: gainsboro;
+  background-color: Gainsboro;
   text-align: center; 
   margin-top: 5px; 
   border: 3px solid blue; 
-  box-shadow: 0 1px 3px rgba(0, 0 0, 0.055)
+  box-shadow: 0 1px 3px rgba(0, 0 0, 0.055);
 }
 
   #initialPage h1 {
     padding-bottom: 10px;
+  }
+
+
+/* instructions */
+
+.instructions {
+  margin-top: 10px; 
+  padding-top: 10px; 
+  background-color:white; 
+  border: 1px solid blue;
+  box-shadow: 0 1px 3px rgba(0, 0 0, 0.055);
+}
+
+  .instructions h2{
+    text-align: center; 
+    color:DarkBlue;
+  }
+
+  .instructions h4{
+    color:green; 
+    margin-bottom:5px; 
+    margin-top: 20px;
+  }
+
+  .instructions img{
+    vertical-align: baseline;
+  }
+
+  .instructions p{
+    line-height:1.2em;
   }
 
 
@@ -84,6 +114,29 @@ body {
 
   #createPlaylist input {
     margin-bottom: 2px;
+  }
+
+
+/* inviteWindow modal */
+
+  #inviteWindow h3{
+    color: blue;
+  }
+
+  #inviteWindow .modal-body {
+    text-align: center;
+  }
+
+  #inviteWindow input {
+    width:auto; 
+    color:blue; 
+    font-weight:bold;
+  }
+
+  #addthisBox {
+    max-width:220px; 
+    margin-left:auto; 
+    margin-right:auto
   }
 
 

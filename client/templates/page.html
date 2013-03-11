@@ -1,11 +1,21 @@
 <template name="page">
   {{#isolate}}
+    {{! Modal windows}}
+
+    {{#if showCreatePlaylist}}
+      {{> createPlaylist}}
+    {{/if}}
+
     {{#if showPhoneSearch}}
       {{> phoneSearchBox}}
     {{/if}}
 
-    {{# if showCreatePlaylist}}
-      {{> createPlaylist}}
+    {{#if playlistSet}}
+      {{> inviteWindow}}
+    {{/if}}
+
+    {{#if showMoreInfo}}
+      {{> moreInfo}}
     {{/if}}
   {{/isolate}}
 

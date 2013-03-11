@@ -6,7 +6,6 @@
 // subscription.
 //
 // Global variables defined here:
-// - testList
 // - showTime function
 // - onYouTubeIframeAPIReady function
 // - Items collection
@@ -15,6 +14,9 @@
 // Global variables used here:
 // - Session.keys.YtAPIready
 // - Session.keys.ScAPIready
+// - Session.keys.playlistSet
+// - Session.keys.showCreatePlaylist
+// - Session.keys.checkedURL
 
 
 
@@ -28,13 +30,15 @@
 
   PlaylistParty.subscribe = function (playlistID) {
 
+
     PlaylistParty.playlistHandle = Meteor.subscribe("playlist", playlistID, {
       
       'onReady': function() {
-        PlaylistParty.itemsHandle = Meteor.subscribe("items", playlistID);
-        PlaylistParty.playlistID = playlistID;
-        Session.set("playlistSet", true);
-        Session.set("showCreatePlaylist", false);
+        PlaylistParty.itemsHandle = Meteor.subscribe("items", playlistID, function() {
+          PlaylistParty.playlistID = playlistID;
+          Session.set("playlistSet", true);
+          Session.set("showCreatePlaylist", false);          
+        });
       },
 
       'onError': function(error) {

@@ -1,0 +1,32 @@
+<template name="inviteWindow">
+  <div id="inviteWindow" class="modal {{hideinvite}}">
+    <div class="modal-header">
+      <button type="button" class="close cancel">&times;</button>
+      <h3>Invite Friends</h3>
+    </div>
+
+    <div class="modal-body">
+      <p>You can invite friends by sending them this URL: </p>
+      <input id="inviteURL" value="{{url}}" type="text" size="45">
+      <p>Or by using one of these <strong>Share</strong> buttons:</p>
+      
+      {{#constant}}
+      <!-- AddThis Button BEGIN -->
+      <div id="addthisBox" class="addthis_toolbox addthis_default_style addthis_32x32_style">
+        <a class="addthis_button_preferred_1"></a>
+        <a class="addthis_button_preferred_2"></a>
+        <a class="addthis_button_preferred_3"></a>
+        <a class="addthis_button_preferred_4"></a>
+        <a class="addthis_button_preferred_5"></a>
+        <a class="addthis_button_compact"></a>
+      </div>
+      <!-- AddThis Button END -->
+      {{/constant}}
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="cancel btn btn-primary">Done</button>
+    </div>
+  </div> 
+</template>

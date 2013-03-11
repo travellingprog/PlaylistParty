@@ -8,19 +8,21 @@
 
 (function() {
 
-  Template.tracks.playlistSet = function() {
-    return Session.get("playlistSet");
+  var template = Template.tracks;
+
+  template.noItems = function() {
+    return (Items.find({}).count() === 0);
   };
   
 
-  Template.tracks.APIsReady = function () {
+  template.APIsReady = function () {
     if (! Session.get("YtAPIready")) return false;
     if (! Session.get("ScAPIready")) return false;
     return true;
   }
 
 
-  Template.tracks.items = function() {
+  template.items = function() {
     return Items.find({},{sort: {seqNo: 1}});
   };
 

@@ -1,13 +1,15 @@
 <template name="tracks">
 
-  {{#if playlistSet}}
-    {{#if APIsReady}}
-      {{#each items}}
-        {{> player}}
-      {{/each}}
-    {{/if}}
-  {{else}}
-    {{> initialPage}}
+  {{#isolate}}
+  {{#if noItems}}
+    {{> instructions}}
+  {{/if}}
+  {{/isolate}}
+      
+  {{#if APIsReady}}
+    {{#each items}}
+      {{> player}}
+    {{/each}}
   {{/if}}
   
 </template>
