@@ -23,7 +23,9 @@
     var totalTime = 0;
     var player = {};
     var curPlayer = false;
-    this.pauseUpdates = true;
+    var prevPlayer, nextPlayer;
+    var livePlayers = [];
+    this.pauseUpdates = false;
     var $timeslider, $volumeslider, $phoneVol;
     var that = this;
 
@@ -86,32 +88,17 @@
 
       this.prev = function() {
         if (! curPlayer) return;
-
-        var curItem = Items.findOne({"_id" : curPlayer.id});
-        var prevItem = Items.findOne({seqNo: {$lt: curItem.seqNo}}, 
-                                     {sort: {seqNo: -1}});
-        if (prevItem) {
-          this.setCurPlayer(prevItem._id);
-        } else {
-          prevItem = Items.findOne({}, {sort: {seqNo: -1}});
-          this.setCurPlayer(prevItem._id);
-        }
+        this.setCurPlayer(prevPlayer);
+        this.updateLivePlayers();
+        scrollToCurPlayer();
       };
 
 
       this.next = function() {
         if (! curPlayer) return;
-
-        var curItem = Items.findOne({"_id" : curPlayer.id});
-        var nextItem = Items.findOne({seqNo: {$gt: curItem.seqNo}}, 
-                                     {sort: {seqNo: 1}});
-    
-        if (nextItem) {
-          this.setCurPlayer(nextItem._id);
-        } else {
-          nextItem = Items.findOne({}, {sort: {seqNo: 1}});
-          this.setCurPlayer(nextItem._id);
-        }
+        this.setCurPlayer(nextPlayer);
+        this.updateLivePlayers();
+        scrollToCurPlayer();
       };
 
 
@@ -123,30 +110,31 @@
       this.curPlayerID = function() {
         this.readingData(Meteor.deps.Context.current, 'curPlayer');
         if (! curPlayer) return false;
-        return curPlayer.id;
+        return curPlayer._id;
       };
 
-      this.setCurPlayer = function(newID) {
-        if ((curPlayer) && (curPlayer.id === newID)) return;
+      this.setCurPlayer = function(item) {
+        if ((curPlayer) && (curPlayer._id === item._id)) return;
 
         // if currently playing, pause until we switch the player
         var continuePlaying = playing;
         if (continuePlaying) curPlayer.pause();
 
         // set new curPlayer
-        player[newID].setVolume(volume);
-        curPlayer = player[newID];
+        item.setVolume(volume);
+        curPlayer = item;
         this.changedData('curPlayer');
 
         scrollToCurPlayer();
-
         curPlayer.updateDuration();
+
         if (continuePlaying) curPlayer.play();  // may not work on mobile devices
       };
 
-      function scrollToCurPlayer()  {
+
+      scrollToCurPlayer = function ()  { 
         var firstPOffset = $('.player :first').offset().top;
-        var newOffset = $('#' + curPlayer.id).parent().offset().top - firstPOffset;
+        var newOffset = $('#' + curPlayer._id).parent().offset().top - firstPOffset;
         $('html, body').animate({scrollTop: newOffset}, 400);  
       };
 
@@ -154,40 +142,131 @@
       //////////////////////////////////////////////////////////////////////////
       // playlist functions 
 
+      function createPlayer (item) {
+        $('#' + item._id).replaceWith('<div id="' + item._id + '"></div>');
 
-      this.hasPlayer = function(IDtoCheck) {
-        if (! player[IDtoCheck]) return false;
-        return true;
-      };
+        if (item.type === 'YouTube') {
+          return new YtPlayer(item._id, item.streamID, item.pic);
+        } else if (item.type === 'SoundCloud') {
+          return new ScPlayer(item._id, item.streamID, item.pic);
+        }
+      }
 
-      this.addPlayer = function(newPlayer) {
-        player[newPlayer.id] = newPlayer;
+      function setPicture (item) {
+        $('#' + item._id).replaceWith('<div id="' + item._id + '"></div>');
+        $('#' + item._id).html('<a class="pic" href="/"><img src="' + item.pic +'" width="232px"></a>');
+      }
+
+      this.updateLivePlayers = function () {
         if (! curPlayer) {
-          this.pauseUpdates = false;
-          this.setCurPlayer(newPlayer.id);
-        } 
+          livePlayers = [];
+          return;
+        }
+
+        var inLivePlayers;
+        var i, l = livePlayers.length;
+
+        var curItem = Items.findOne({"_id" : curPlayer._id});
+
+        // set up nextPlayer
+        var nextItem = Items.findOne({seqNo: {$gt: curItem.seqNo}}, 
+                                     {sort: {seqNo: 1}});
+        if (! nextItem) nextItem = Items.findOne({}, {sort: {seqNo: 1}});
+
+        inLivePlayers = false;
+        for (i = 0; i < l; i++) {
+          if (livePlayers[i]._id === nextItem._id) {
+            nextPlayer = livePlayers[i];
+            inLivePlayers = true;
+          }
+        }
+
+        if (! inLivePlayers) nextPlayer = createPlayer(nextItem);
+
+
+        // set up prevPlayer
+        var prevItem = Items.findOne({seqNo: {$lt: curItem.seqNo}}, 
+                                     {sort: {seqNo: -1}});
+        if (! prevItem) prevItem = Items.findOne({}, {sort: {seqNo: -1}});
+
+        inLivePlayers = false;
+        for (i = 0; i < l; i++) {
+          if (livePlayers[i]._id === prevItem._id) {
+            prevPlayer = livePlayers[i];
+            inLivePlayers = true;
+          }
+        }        
+
+        if (! inLivePlayers) prevPlayer = createPlayer(prevItem);
+
+        
+        // remove any live players that are no longer in the curPlayer zone
+        var newLivePlayers = [prevPlayer, curPlayer, nextPlayer];
+        var keep = false;
+
+        for (i = 0; i < l; i++) {
+          for (var j=0, m = newLivePlayers.length; j < m; j++) {
+            if (livePlayers[i]._id === newLivePlayers[j]._id) {
+              keep = true;
+            }
+          }
+          if (! keep) setPicture(livePlayers[i]);
+          keep = false;
+        }        
+
+        livePlayers = newLivePlayers;
+      }
+
+
+      this.itemAdded = function(newItem) {
+        if (! curPlayer) {
+          var newPlayer = createPlayer(newItem);
+          this.setCurPlayer(newPlayer);
+          livePlayers = [curPlayer];
+        } else {
+          setPicture(newItem);
+        }
+
+        // check that we're not waiting on other item containers to be rendered
+        // before updating live players
+        // (i.e. that this is the currently last item on the playlist)
+        if (newItem._id === Items.findOne({}, {sort: {seqNo: -1}})._id) {
+          this.updateLivePlayers();  
+        }        
       };
 
 
-      this.removePlayer = function(playerID) {
-        if (curPlayer === player[playerID]) {
+      this.removeItem = function (item) {
+        if (curPlayer._id === item._id) {
           if (Items.find({}).count() > 1) {
-            this.next();
-            //note: going to the next track will auto-pause the current one
+            var goToNext = true;
           } else {
             curPlayer.pause();
             curPlayer = false;
             this.setCurTime(0);
             this.setTotalTime(0);
-            this.pauseUpdates = true;
+            this.pauseUpdates = true;  
           }
         }
 
-        delete player[playerID];
-
-        Items.remove(playerID, function (error) {
+        Items.remove(item._id, function (error) {
           if (error !== undefined) alert(error);
         });
+
+        if (goToNext) {
+          boombox.next();
+          return;
+        }
+
+        this.updateLivePlayers();
+      };
+
+
+      this.clickedPicture = function(item) {
+        var newPlayer = createPlayer(item);
+        this.setCurPlayer(newPlayer);
+        this.setPlaying(true);
+        this.updateLivePlayers();
       };
 
 
@@ -218,7 +297,7 @@
           curPlayer.updateDuration();
         }
         setTimeout(that.updatePlayerInfo, 500);
-      }
+      };
 
 
       //////////////////////////////////////////////////////////////////////////
@@ -330,7 +409,7 @@
           setTimeout(function () {
             that.pauseUpdates = false;
             that.phoneVolTracking();   // some bug requires this
-          }, 1000);          
+          }, 1000);   
         }
       };
 
@@ -344,5 +423,200 @@
 
 
   boombox = new Boombox();
+
+
+  ///////////////////////////////////////////////////////////////////////////////
+  // YouTube Player object
+
+
+  var YtPlayer = function(id, streamID, pic) {
+
+    this._id = id;
+    this.pic = pic;
+    this.isReady = false;
+    var that = this;
+
+
+    this.ytplayer = new YT.Player(id, {
+      height: '200',
+      width: '232',
+      videoId: streamID,
+      events: {
+        'onReady': function () { YtPlayer.onPlayerReady.call(that) },
+        'onStateChange': function (e) {
+          YtPlayer.onPlayerStateChange.call(that, e);
+        }
+      }
+    });
+  };
+
+
+  YtPlayer.prototype.play = function () {
+    if (this.isReady) {
+      this.ytplayer.playVideo();  
+    }
+  };
+   
+
+  YtPlayer.prototype.pause = function () {
+    if (this.isReady) {
+      this.ytplayer.pauseVideo();  
+    }
+  };
+
+
+  YtPlayer.prototype.setVolume = function (newVolume) {
+    if (this.isReady) {
+      this.ytplayer.setVolume(newVolume);  
+    }
+  };
+
+
+  YtPlayer.prototype.updateVolume = function () {
+    if (this.isReady) {
+      var newVolume = this.ytplayer.getVolume();
+      if (newVolume != boombox.getVolume()) {
+        boombox.setVolume(newVolume, 'player');
+      }
+    }
+  };
+
+
+  YtPlayer.prototype.setNewTime = function (newTime) {
+    if (this.isReady) {
+      this.ytplayer.seekTo(newTime, true);
+    }
+  };
+
+
+  YtPlayer.prototype.updateCurrentTime = function() {
+    if (this.isReady) {
+      boombox.setCurTime( 
+        Math.ceil(this.ytplayer.getCurrentTime()), 'player' );
+    }
+  };
+
+
+  YtPlayer.prototype.updateDuration = function() {
+    if (this.isReady) {
+      boombox.setTotalTime( Math.floor(this.ytplayer.getDuration()) );  
+    }
+  };
+
+
+  YtPlayer.onPlayerReady = function(event) {
+    this.isReady = true;
+    this.setVolume(boombox.getVolume());
+    if ((this._id === boombox.curPlayerID()) && boombox.isPlaying()) {
+      this.play();
+    }
+  };
+
+
+  YtPlayer.onPlayerStateChange = function(event) {
+
+    var newState = event.data;
+    var state = YT.PlayerState;
+
+    if (newState === state.PLAYING) {
+      boombox.setCurPlayer(this);
+      boombox.setPlaying(true);
+      boombox.updateLivePlayers();
+      return;
+    }
+
+    if (boombox.curPlayerID() !== this._id) return;
+
+    if (newState === state.PAUSED) {
+      boombox.setPlaying(false);
+    }
+
+    if (newState === state.ENDED) {
+      // because Pause state is called right before Ended...
+      boombox.setPlaying(true);
+      // ... then ...
+      boombox.next();
+    }
+  };
+
+
+  ///////////////////////////////////////////////////////////////////////////////
+  // SoundCloud Player object
+
+  var ScPlayer = function(id, streamID, pic) {
+
+    this._id = id;
+    this.pic = pic;
+    this.scplayer = null;
+    this.isReady = false;
+    var that = this;
+
+    SC.oEmbed(streamID, {maxwidth: '232px', maxheight: '200px'}, function(oEmbed) {
+
+      var embedHTML = (oEmbed.html).replace('<iframe', '<iframe id="' + id + '"');
+      $("#" + id).replaceWith(embedHTML);
+
+      that.scplayer = SC.Widget(id.toString());
+      that.scplayer.bind (SC.Widget.Events.READY, function () {
+
+        that.isReady = true;
+        that.scplayer.setVolume(boombox.getVolume());
+        if ((this._id === boombox.curPlayerID()) && boombox.isPlaying()) {
+          this.play();
+        }
+
+        that.scplayer.bind(SC.Widget.Events.PLAY, function () {
+          boombox.setCurPlayer(that);
+          boombox.setPlaying(true);
+          boombox.updateLivePlayers();
+        });
+
+        that.scplayer.bind(SC.Widget.Events.PAUSE, function () {
+          if (id === boombox.curPlayerID()) boombox.setPlaying(false);
+        });
+
+        that.scplayer.bind(SC.Widget.Events.FINISH, function () {
+          if (id === boombox.curPlayerID()) boombox.next();
+        });
+      });
+
+    });
+  }
+
+
+  ScPlayer.prototype.play = function () {
+    if (this.isReady) this.scplayer.play();
+  };
+
+  ScPlayer.prototype.pause = function () {
+    if (this.isReady) this.scplayer.pause();
+  };
+
+  ScPlayer.prototype.setVolume = function (newVolume) {
+    if (this.isReady) this.scplayer.setVolume(newVolume);
+  };
+
+  ScPlayer.prototype.updateVolume = function () {
+    // NOTE: The SoundCloud widget does not offer any volume control... yet
+    return;
+  };
+
+  ScPlayer.prototype.setNewTime = function (newTime) {
+    this.scplayer.seekTo(newTime * 1000);
+  };
+
+  ScPlayer.prototype.updateCurrentTime = function() {
+    if (! this.isReady) return;
+    this.scplayer.getPosition(function (position) {
+      boombox.setCurTime(Math.round(position / 1000), 'player');
+    });
+  };
+
+  ScPlayer.prototype.updateDuration = function() {
+    if (! this.isReady) return;
+    this.scplayer.getDuration(function (duration) {
+      boombox.setTotalTime(Math.round(duration / 1000));
+    });
+  };
 
 })();

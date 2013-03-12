@@ -229,6 +229,7 @@
       "streamID" : item.streamID,
       "artist": item.artist,
       "title": item.title,
+      "pic": item.pic,
       "seqNo" : parseFloat(seqNo + "." + (new Date()).getTime()), 
       "addedBy" : 'user1'
     });

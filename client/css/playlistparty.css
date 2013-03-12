@@ -172,6 +172,11 @@ body {
     background-color: #e6f7ff;
   }
 
+  .player img {
+    background-color: OrangeRed;
+    max-width: 90%; 
+  }
+
   .player .player-bottom {
     text-align: left;
     width: 228px;
