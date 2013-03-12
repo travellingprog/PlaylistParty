@@ -68,6 +68,10 @@
       this.toggleShuffle = function() {
         shuffle = ! shuffle;
         this.changedData('shuffle');
+
+        if (shuffle) {
+          
+        }
       };
 
 
@@ -88,6 +92,11 @@
 
       this.prev = function() {
         if (! curPlayer) return;
+        if (loop) {
+          curPlayer.setNewTime(0);
+          curPlayer.play();
+          return;
+        }
         this.setCurPlayer(prevPlayer);
         this.updateLivePlayers();
         scrollToCurPlayer();
@@ -96,6 +105,11 @@
 
       this.next = function() {
         if (! curPlayer) return;
+        if (loop) {
+          curPlayer.setNewTime(0);
+          curPlayer.play();
+          return;
+        }
         this.setCurPlayer(nextPlayer);
         this.updateLivePlayers();
         scrollToCurPlayer();
