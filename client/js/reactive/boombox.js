@@ -27,6 +27,7 @@
     var livePlayers = [];
     this.pauseUpdates = false;
     var $timeslider, $volumeslider, $phoneVol;
+    this.shuffleSequence = [];
     var that = this;
 
 
@@ -69,9 +70,20 @@
         shuffle = ! shuffle;
         this.changedData('shuffle');
 
+        this.shuffleSequence = [];
+
         if (shuffle) {
+          // make shuffle sequence
+          var itemsArray = Items.find({}).fetch();
+          var randNo, randItem;
           
+          for (var i = itemsArray.length - 1; i >= 0; i--) {
+            randNo = Math.floor(Math.random() * i);
+            randItem = (itemsArray.splice(randNo, 1))[0];
+            this.shuffleSequence.push(randItem._id);
+          }
         }
+        this.updateLivePlayers();
       };
 
 
@@ -113,6 +125,14 @@
         this.setCurPlayer(nextPlayer);
         this.updateLivePlayers();
         scrollToCurPlayer();
+      };
+
+
+      this.clickedPicture = function(item) {
+        var newPlayer = createPlayer(item);
+        this.setCurPlayer(newPlayer);
+        this.setPlaying(true);
+        this.updateLivePlayers();
       };
 
 
@@ -180,12 +200,27 @@
         var inLivePlayers;
         var i, l = livePlayers.length;
 
-        var curItem = Items.findOne({"_id" : curPlayer._id});
+        if (! shuffle) {
+          var curItem = Items.findOne({"_id" : curPlayer._id});  
+        }
+        else {
+          var curIndex = this.shuffleSequence.indexOf(curPlayer._id);  
+          var sL = this.shuffleSequence.length;
+        }        
+        
 
         // set up nextPlayer
-        var nextItem = Items.findOne({seqNo: {$gt: curItem.seqNo}}, 
+        var nextItem;
+        if (! shuffle) {
+          nextItem = Items.findOne({seqNo: {$gt: curItem.seqNo}}, 
                                      {sort: {seqNo: 1}});
-        if (! nextItem) nextItem = Items.findOne({}, {sort: {seqNo: 1}});
+          if (! nextItem) nextItem = Items.findOne({}, {sort: {seqNo: 1}});  
+        }
+        else {
+          var nextIndex = (curIndex + 1 < sL) ? curIndex + 1 : 0;
+          nextItem = Items.findOne({_id: this.shuffleSequence[nextIndex]});
+        }
+        
 
         inLivePlayers = false;
         for (i = 0; i < l; i++) {
@@ -199,9 +234,16 @@
 
 
         // set up prevPlayer
-        var prevItem = Items.findOne({seqNo: {$lt: curItem.seqNo}}, 
-                                     {sort: {seqNo: -1}});
-        if (! prevItem) prevItem = Items.findOne({}, {sort: {seqNo: -1}});
+        var prevItem;
+        if (! shuffle) {
+          prevItem = Items.findOne({seqNo: {$lt: curItem.seqNo}}, 
+                                       {sort: {seqNo: -1}});
+          if (! prevItem) prevItem = Items.findOne({}, {sort: {seqNo: -1}});
+        }
+        else {
+          var prevIndex = (curIndex === 0) ? sL - 1 : curIndex - 1;
+          prevItem = Items.findOne({_id: this.shuffleSequence[prevIndex]});
+        }
 
         inLivePlayers = false;
         for (i = 0; i < l; i++) {
@@ -241,6 +283,11 @@
           setPicture(newItem);
         }
 
+        if (shuffle) {
+          var randNo = Math.floor(Math.random() * (this.shuffleSequence.length - 1));
+          this.shuffleSequence.push(randNo, 0, newItem._id);
+        }
+
         // check that we're not waiting on other item containers to be rendered
         // before updating live players
         // (i.e. that this is the currently last item on the playlist)
@@ -263,6 +310,11 @@
           }
         }
 
+        if (shuffle) {
+          var ind = this.shuffleSequence.indexOf(item._id);
+          this.shuffleSequence.splice(ind, 1);
+        }
+
         Items.remove(item._id, function (error) {
           if (error !== undefined) alert(error);
         });
@@ -272,14 +324,6 @@
           return;
         }
 
-        this.updateLivePlayers();
-      };
-
-
-      this.clickedPicture = function(item) {
-        var newPlayer = createPlayer(item);
-        this.setCurPlayer(newPlayer);
-        this.setPlaying(true);
         this.updateLivePlayers();
       };
 
