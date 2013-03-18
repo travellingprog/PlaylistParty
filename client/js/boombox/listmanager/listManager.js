@@ -26,6 +26,8 @@
 
     function initialize () {
       curPlayer = null;
+      nextPlayer = null;
+      prevPlayer = null;
       livePlayers = [];
       shuffle = false;
       shuffleSequence = [];
@@ -45,7 +47,7 @@
         {
           if (shuffle) removeFromShuffle(id);
           removeFromLivePlayers(id);
-          if (curPlayer._id === id) {
+          if (curPlayer && curPlayer._id === id) {
             boombox.setCurPlayer('curPlayerRemoved');  
             self.next()
           }
@@ -57,6 +59,7 @@
         }
         else 
         {
+          if (timeoutID) clearTimeout(timeoutID);
           initialize();
           boombox.setCurPlayer('none');
         }        
@@ -101,7 +104,7 @@
       timeoutID = setTimeout( function() {
         self.setCurPlayer();
       }, 1000);
-    }
+    };
 
 
     this.setCurPlayer = function () {
@@ -111,7 +114,7 @@
       timeoutID = setTimeout( function() {
         self.setNextPlayer();
       }, 250); 
-    }
+    };
 
 
     this.setNextPlayer = function () {
@@ -119,7 +122,7 @@
       timeoutID = setTimeout( function() {
         self.setPrevPlayer();
       }, 250);  
-    }
+    };
 
 
     this.setPrevPlayer = function () {
@@ -138,10 +141,12 @@
         }, 5000);
       }
       
-    }
+    };
 
 
     this.scrollToCurPlayer = function() {
+      if (! curPlayer) return;
+
       // make sure the adjacent players are rendered before 
       // scrolling to the current player
       if (prevPlayer.isReady && nextPlayer.isReady) 
@@ -163,6 +168,8 @@
 
 
     this.setPictures = function() {
+      if (! curPlayer) return;
+
       // any live player we don't need, replace it with a picture
       var keep;
       for (var i = livePlayers.length - 1; i >= 0; i--) {
@@ -185,7 +192,9 @@
 
 
     function createPlayer (frame) {
-      // check self we haven't already built this player
+      if (! frame) return null;
+
+      // check that we haven't already built this player
       if ($('#' + frame._id + ' img').length) 
       {
         var newPlayer;
@@ -262,6 +271,8 @@
 
 
     function getNextFrame() {
+      if (! curFrame) return null;
+
       if (!shuffle) {
         var nextFrame = frames.findOne({seqNo: {$gt: curFrame.seqNo}}, 
                                      {sort: {seqNo: 1}});
@@ -277,6 +288,8 @@
 
 
     function getPrevFrame() {
+      if (! curFrame) return null;
+
       if (!shuffle) {
         var prevFrame = frames.findOne({seqNo: {$lt: curFrame.seqNo}}, 
                                        {sort: {seqNo: -1}});

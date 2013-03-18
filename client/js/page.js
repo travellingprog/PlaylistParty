@@ -32,5 +32,9 @@
     return Session.get("showExitWarning");
   };
 
+  template.showRemoveAllWarning = function() {
+    return Session.get("showRemoveAllWarning");
+  };
+
 })();
 
