@@ -3,7 +3,6 @@
 //
 // Global variables used:
 // - Session.keys.searching
-// - ReactiveData function
 // - Items Collection
 
 
@@ -14,23 +13,22 @@
 
   function Selection() {
     this.arr = [];
+    this.selectionDeps = new Deps.Dependency;
   }
 
-  Selection.prototype = new ReactiveData();
-
   Selection.prototype.get = function() {
-    this.readingData(Meteor.deps.Context.current, 'selection');
+    Deps.depend(this.selectionDeps);
     return this.arr;
   };
 
   Selection.prototype.length = function() {
-    this.readingData(Meteor.deps.Context.current, 'selection');
+    Deps.depend(this.selectionDeps);
     return this.arr.length;
   }; 
 
   Selection.prototype.add = function(newItem) {
     this.arr.push(newItem);
-    this.changedData('selection');
+    this.selectionDeps.changed();
   };
 
   Selection.prototype.remove = function(item) {
@@ -42,15 +40,14 @@
     }
     
     if (i === l) return;  // no match, so no change
-    this.changedData('selection');
+    this.selectionDeps.changed();
   };
 
   Selection.prototype.reset = function() {
     this.arr = [];
-    this.changedData('selection');
+    this.selectionDeps.changed();
   };
 
-  Selection.prototype.constructor = Selection;
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -80,11 +77,16 @@
   template.noSearchError = function () {
     return (! this.engine.errorMessage);
   };
+
+
+  template.someResult = function() {
+    var resultsLength = this.engine.results.length;
+    return (resultsLength === 0) ? false : true;
+  };
   
 
   template.result = function () {
     var resultsLength = this.engine.results.length;
-    if (resultsLength === 0) return;
     var startIndex = this.engine.index();
     var endIndex = startIndex + 5;
     if (resultsLength < endIndex) endIndex = resultsLength;
@@ -238,6 +240,7 @@
 
   var closeSearch = function() {
     $('#deskMenu .active').tab("show");
+    $(window).scrollTop(PlaylistParty.previousScrollTop);
     selection.reset();
     Session.set("searching", false);
     Template.search.resetSearchEngines();

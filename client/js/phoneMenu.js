@@ -9,6 +9,8 @@
 
 (function() {
 
+  var boombox = PlaylistParty.boombox;
+
   var template = Template.phoneMenu;
 
   template.disableLink = function(element) {

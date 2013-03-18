@@ -5,22 +5,26 @@
     <div class="results">
       {{#if searchComplete}}
         {{#if noSearchError}}
-          {{#each result}}
-            <div class="span-custom">
-              <div class="singleResult {{selected}}">
-                {{{description}}}
-                <p><img src="{{pic}}"></p>
-                <button class="{{hideAdd}} addItem btn btn-success">Add</button>
-                <button class="selectItem btn btn-warning">{{SelectOrUnselect}}</button>
+          {{#if someResult}}
+            {{#each result}}
+              <div class="span-custom">
+                <div class="singleResult {{selected}}">
+                  {{{description}}}
+                  <p><img src="{{pic}}"></p>
+                  <button class="{{hideAdd}} addItem btn btn-success">Add</button>
+                  <button class="selectItem btn btn-warning">{{SelectOrUnselect}}</button>
+                </div>
               </div>
-            </div>
-          {{/each}}
+            {{/each}}
+          {{else}}
+            <div class="text-center"><span class="label label-inverse">No Results</span></div>
+          {{/if}}
         {{else}}
-          <span class="label label-inverse">SEARCH ERROR</span>
+          <div class="text-center"><span class="label label-inverse">SEARCH ERROR</span></div>
           {{errorMsg}}
         {{/if}}
       {{else}}
-        <span class="label label-info">Loading...</span>
+        <div class="text-center"><span class="label label-info">Loading...</span></div>
       {{/if}}
     </div>
     <div class = "btn-toolbar">

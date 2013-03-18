@@ -12,12 +12,20 @@
   template.playlistSet = function() {
     return Session.get("playlistSet");
   };
+
+
+  Meteor.startup(function () {
+
+    $('body').on('shown', '#deskMenu button[data-toggle="tab"]', function(e) {
+      PlaylistParty.activeTab = e.target.dataset.target;
+    });
+
+    $('body').on('shown', '#normSearchBtn', function(e) {
+      PlaylistParty.activeTab = '#search';
+    });
+  });
   
 
 })();
 
 
-// tab behaviour
-// $('body').on('shown', '#deskMenu button[data-toggle="tab"]', function(e) {
-//   alert(e.target.dataset.target);
-// });

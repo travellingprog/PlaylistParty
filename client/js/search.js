@@ -3,7 +3,6 @@
 //
 // Global variables used:
 // - Session.keys.searching
-// - ReactiveData function
 // - showTime function (for Soundcloud search results)
 
 
@@ -14,10 +13,10 @@
 
   function SearchEngine (searchFn) {
     this.setDefaultValues();
+    this.compFlagDeps = new Deps.Dependency;
+    this.navIndexDeps = new Deps.Dependency;
     this.search = searchFn;
   }
-
-  SearchEngine.prototype = new ReactiveData();
 
   SearchEngine.prototype.setDefaultValues = function() {
     this.compFlag = false;
@@ -27,26 +26,24 @@
   };
 
   SearchEngine.prototype.complete = function() {
-    this.readingData(Meteor.deps.Context.current, 'compFlag');
+    Deps.depend(this.compFlagDeps);
     return this.compFlag;
   };
 
   SearchEngine.prototype.setComplete = function() {
     this.compFlag = true;
-    this.changedData('compFlag');
+    this.compFlagDeps.changed();
   };
 
   SearchEngine.prototype.index = function() {
-    this.readingData(Meteor.deps.Context.current, 'navIndex');
+    Deps.depend(this.navIndexDeps);
     return this.navIndex;
   };
 
   SearchEngine.prototype.setIndex = function(newIndex) {
     this.navIndex = newIndex;
-    this.changedData('navIndex');
+    this.navIndexDeps.changed();
   };
-
-  SearchEngine.prototype.constructor = SearchEngine;
 
 
   /////////////////////////////////////////////////////////////////////////////
@@ -58,7 +55,7 @@
     var searchURL = "https://www.googleapis.com/youtube/v3/search";
     var param = {};
     var that = this;
-    param["q"] = '"' + query + '"';
+    param["q"] = 'intitle:' + query;
     param["type"] = "video";
     param["key"] = "AIzaSyC9NItPbDx4SdF3DQJn-5dT2fL1qtNACKI";
     param["videoEmbeddable"] = true;
@@ -178,6 +175,9 @@
       template.searchAPI[i].engine.setDefaultValues();
       template.searchAPI[i].engine.search(this.query);
     }
+
+    // save current scroll position
+    PlaylistParty.previousScrollTop = $(window).scrollTop();
 
     // show the page
     Session.set("searching", true);

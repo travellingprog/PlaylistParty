@@ -23,7 +23,7 @@
     } else {
       $('head').append(addThisScript);
     }
-    template.addthisConfig();
+    // template.addthisConfig();
   };
 
   template.addthisConfig = function() {
@@ -31,7 +31,7 @@
       addthis_share["title"] = "Playlist Party: " + Playlist.findOne().name;
       addthis_share["description"] = "Join in on this playlist!";
     } else {
-      setTimeout(Template.inviteWindow.addthisConfig, 1000);
+      setTimeout(function () { Template.inviteWindow.addthisConfig() }, 1000);
     }
   };
 

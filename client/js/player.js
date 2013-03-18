@@ -12,6 +12,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // player template functions
 
+  var boombox = PlaylistParty.boombox;
 
   var template = Template.player;
 
@@ -21,13 +22,15 @@
 
   template.rendered = function() {
     if (this.newItem) {
+      $('#' + this.data._id).replaceWith('<div id="' + this.data._id + '"></div>');
+      $('#' + this.data._id).html('<a class="pic" href="/"><img src="' + this.data.pic +'" width="232px"></a>');
       boombox.itemAdded(this.data);
       this.newItem = false;
     }
   };
 
-  template.isCurrent = function () {
-    return (this._id === boombox.curPlayerID()) ? 'current' : '';
+  template.isCurrentFrame = function () {
+    return (this._id === boombox.curFrameID()) ? 'current' : '';
   };
 
   template.trackNo = function() {
@@ -50,9 +53,9 @@
       boombox.removeItem(this);
     },
 
-    'click a.pic' : function() {
+    'click a.pic' : function(e) {
+      e.preventDefault();
       boombox.clickedPicture(this);
-      return false;
     }
   });
 

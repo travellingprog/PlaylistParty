@@ -8,16 +8,122 @@
   // - Session.keys.controlsHidden
   // - Items collection
   
+  var boombox = PlaylistParty.boombox;
 
   var template = Template.controls;
-  var initialFlag = false;
 
+  var $timeslider, $volumeslider, $phoneVol;
+  var tComp1, tComp2, vComp;
+
+
+  //////////////////////////////////////////////////////////////////////////
+  // volume and time controls
+
+
+  var initialFlag = false;
   template.rendered = function() {
     // Initialization
-    if (! initialFlag) boombox.initiateControls();
+    if (! initialFlag) {
+      initiateControls();
+    }
     initialFlag = true;
   };
 
+  
+  function initiateControls () {
+    // Set the volume controls
+    $phoneVol = $("#phoneVol");
+    phoneVolTracking();
+
+    $volumeslider = $('#volumeslider');
+    initiateVolumeSlider();
+
+    // Set the time slider control
+    $timeslider = $('#timeslider');
+    initiateTimeSlider();
+  };
+
+  function phoneVolTracking () {
+    Deps.autorun(function () {
+      $phoneVol.tooltip('destroy');
+      $phoneVol.tooltip({
+        title: (Math.round(boombox.getVolume()) ).toString(),
+        delay: 250 //,
+        // trigger: 'hover click'
+      });
+      $phoneVol.tooltip('show');
+    });
+  }
+
+  function initiateVolumeSlider () {
+    $volumeslider.slider({
+      range: 'min',
+      animate: true,
+      'value': (Math.round(boombox.getVolume()) ).toString(),
+      start: function() { 
+        boombox.pauseUpdates = true;
+        vComp.stop();
+      },
+      slide: function(event, ui) { 
+        boombox.setVolume(ui.value) 
+      },
+      stop: function(event, ui) {  
+        boombox.setVolume(ui.value);
+        setTimeout(function () {
+            boombox.pauseUpdates = false;
+            startVolTracking();
+        }, 1000);
+      }
+    });
+    startVolTracking();
+  }
+
+  function startVolTracking () {
+    vComp = Deps.autorun(function() {
+      $volumeslider.slider('value', boombox.getVolume());
+    });    
+  }
+
+  function initiateTimeSlider () {
+    $timeslider.slider({
+      range: 'min',
+      max: 0, 
+      animate: true,
+      start: function() { 
+        boombox.pauseUpdates = true;
+        stopTimeTracking(); 
+      },
+      slide: function(event, ui) { 
+        boombox.setCurTimeLabel(ui.value) 
+      },
+      stop: function(event, ui) {
+        boombox.setCurTime(ui.value);
+        setTimeout(function () {
+            startTimeTracking();
+            boombox.pauseUpdates = false;
+        }, 1000);
+      }
+    });
+    startTimeTracking();
+  }
+
+  function startTimeTracking () {
+    tComp1 = Deps.autorun(function() {
+      $timeslider.slider('value', boombox.getCurTimeLabel());
+    });
+    tComp2 = Deps.autorun(function() {
+      $timeslider.slider('option', 'max', boombox.getTotalTime());
+    });
+  }
+
+  function stopTimeTracking () {
+    tComp1.stop();
+    tComp2.stop();
+  }
+
+
+  //////////////////////////////////////////////////////////////////////////
+  // template helpers
 
 
   template.isHidden = function() {
@@ -31,7 +137,7 @@
 
 
   template.curTime = function() {
-    return showTime(boombox.getCurTime());
+    return showTime(boombox.getCurTimeLabel());
   };
 
 
@@ -89,7 +195,7 @@
     },
 
 
-    'click #prev' : function() {        // maybe change later so it can restart song
+    'click #prev' : function() {
       boombox.prev();
     },
 

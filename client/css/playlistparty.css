@@ -160,6 +160,7 @@ body {
     padding: 5px 1px 5px 1px;
     border: 1px solid #DDDDDD;
     border-radius: 4px 4px 4px 4px;
+    min-height: 332px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
   }
 
@@ -214,11 +215,16 @@ body {
     margin: 10px 0 10px 0;
   }
 
+  .searchEngine {
+    border-bottom: 1px dotted green;
+  }
+
   .searchEngine > .btn-toolbar {
     clear: both;
     text-align: center;
     padding-top: 10px;
-    margin-bottom: 40px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
   }
 
   .searchEngine > .btn-toolbar .btn {
@@ -249,7 +255,7 @@ body {
   }
 
 
-#footer {
+/*#footer {
   width: 100%;
   margin-bottom: 0;
   position: fixed;
@@ -257,12 +263,16 @@ body {
   right: 0;
   bottom: 0;
   z-index: 1030;
-  /*background-color: White;*/
-}
+  background-color: White;
+}*/
 
 #controlbox, #controlbox-minimized {
-  max-width: 450px;
-  margin: 0 auto 0 auto;
+  position: fixed;
+  bottom: 0;
+  z-index: 1030;
+  left: 50%;
+  margin-left: -240px;
+  max-width: 480px;
   border-color: red;
   border-radius: 4px 4px 0px 0px;
   border-style: solid;
@@ -548,8 +558,16 @@ body {
 
   /* controls */
   #controlbox {
+    left: 0 !important;
+    right: 0;
+    margin-left: 0px !important;
     padding-left: 5px !important;
     padding-right: 5px !important;
+  }
+
+  #controlbox-minimized {
+    left: 0 !important;
+    margin-left: 0px !important;
   }
 
     #phoneVol {
