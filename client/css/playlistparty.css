@@ -140,7 +140,24 @@ body {
   }
 
 
-/* tracks */
+/* exitWarning modal */
+
+  #exitWarning h3{
+    color: blue;
+  }
+
+  #exitWarning .modal-body {
+    text-align: center;
+  }
+
+  #exitWarning input {
+    width:auto; 
+    color:blue; 
+    font-weight:bold;
+  }
+
+
+  /* tracks */
 
   /* modded BootStrap tab behavior, because "display:none" is forbidden by Soundcloud API */
   #tracks.active {

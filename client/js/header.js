@@ -16,5 +16,14 @@
     return Session.get("playlistSet");
   };
 
+  Template.header.events({
+    'click .home': function(e) {
+      e.preventDefault();
+      if (! Session.get("playlistSet")) return;
+
+      Session.set("showExitWarning", true);
+    }
+  })
+
 })();
 

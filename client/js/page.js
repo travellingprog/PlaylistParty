@@ -28,5 +28,9 @@
     return Session.get("showMoreInfo");
   };
 
+  template.showExitWarning = function() {
+    return Session.get("showExitWarning");
+  };
+
 })();
 

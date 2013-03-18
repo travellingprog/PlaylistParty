@@ -22,7 +22,8 @@
         PlaylistParty.itemsHandle = Meteor.subscribe("items", playlistID, function() {
           PlaylistParty.playlistID = playlistID;
           Session.set("playlistSet", true);
-          Session.set("showCreatePlaylist", false);          
+          Session.set("showCreatePlaylist", false);
+          window.parent.document.title = "Playlist Party - " + Playlist.findOne().name;
         });
       },
 
