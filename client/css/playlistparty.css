@@ -157,7 +157,41 @@ body {
   }
 
 
-  /* tracks */
+/* options */
+
+  #options h2{
+    text-align:center;
+    background-color:MidnightBlue;
+    color:white;
+  }
+
+  #options h3{
+    text-align:center;
+    color:DarkBlue;
+    border:1px dotted blue;
+  }
+
+  #options > .subsection{
+    padding-left: 20px;
+  }
+
+  #options .answer {
+    display:none;
+    padding-left: 10px;
+  }
+
+  #options .answer > h4{
+    color: green;
+    margin-top: 15px;
+    margin-bottom: 5px;
+  }
+
+  #options .answer img {
+    vertical-align: baseline;
+  }
+
+
+/* tracks */
 
   /* modded BootStrap tab behavior, because "display:none" is forbidden by Soundcloud API */
   #tracks.active {
@@ -271,17 +305,6 @@ body {
     max-width: 90%;
   }
 
-
-/*#footer {
-  width: 100%;
-  margin-bottom: 0;
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1030;
-  background-color: White;
-}*/
 
 #controlbox, #controlbox-minimized {
   position: fixed;
