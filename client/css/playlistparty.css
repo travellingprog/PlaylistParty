@@ -43,9 +43,18 @@ body {
   }
 
 
+#loginButtons {
+  background-color: white;
+  display: block;
+  position: fixed;
+  right: 15px;
+  text-align: right;
+  max-height: 20px;
+  width: 100%;
+}
+
 .tab-pane {
-  margin: 0px auto 0px auto;
-  padding-top: 84px;
+  margin: 0px auto;
 }
 
 .tab-pane:after {    /* Clear space for the footer */
@@ -208,7 +217,7 @@ body {
   .player {
     margin-left: 2px;
     margin-right: 2px;
-    padding: 5px 1px 5px 1px;
+    padding: 0px 1px 10px 1px;
     border: 1px solid #DDDDDD;
     border-radius: 4px 4px 4px 4px;
     min-height: 332px;
@@ -450,6 +459,14 @@ body {
 /* Tablet and Desktop Only */
 @media (min-width: 768px) {
 
+  #loginButtons {
+    top: 84px;
+  }
+
+  .tab-content {
+    padding-top: 104px;
+  }
+
   /* header */
 
     #header .left, #header .right {
@@ -493,6 +510,14 @@ body {
 
 /* Landscape Phone And Portrait Phone */
 @media (max-width: 767px) {
+
+  #loginButtons {
+    top: 60px;
+  }
+
+  .tab-content {
+    padding-top: 80px;
+  }
 
   /* header */
 

@@ -1,6 +1,9 @@
-{
-  "_id" : //some auto-generated unique identifier
-  "name" : "My Playlist!",
-  "public" : true,
-  "password" : "encPassword"
+{ 
+  "name" : "test", 
+  "url" : "20mar13/m72s1c", 
+  "password" : false, 
+  "_id" : "DrReQAu7MkeQczRP8",
+  "owner": ["user._id"],
+  "type": "anonymous or publicUsers",
+  "users": ["user1._id", "user2._id", "etc."]
 }

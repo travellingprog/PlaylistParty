@@ -10,13 +10,15 @@
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // playlist creation
+  // playlist creation/modification
 
   var months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun',
                 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
   var chars = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 
                'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 
                'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+  var playlistTypes = ['anonymous', 'publicUsers'];
 
 
   // function from JavaScript Garden
@@ -66,6 +68,97 @@
       });
 
       return newURL;
+    },
+
+
+    addOwner: function(playlistID, userID) {
+      if (! (is('String', playlistID)  &&  is('String', userID) )) {
+        throw new Meteor.Error(400, 'Invalid data provided.');
+      }
+
+      if ((playlistID.length === 0)  ||  (userID.length === 0)) {
+        throw new Meteor.Error(400, 'Invalid data provided.');
+      }
+
+      var playlist = Playlist.findOne({'url': playlistID});
+      var newOwner = Meteor.users.findOne(userID);
+
+      if ((! playlist) || (! newOwner)) {
+        throw new Meteor.Error(400, 'Invalid data provided.');
+      }
+
+      // TO DO: if the playlist has users, check that this new owner is
+      // part of those users.
+
+      // TO DO: check that this call is coming from a current owner
+      // of the playlist
+
+      if (playlist.owner.indexOf(userID) < 0) {
+        Playlist.update(playlist._id, {$push: {'owner': userID }});
+
+        // add to playlist users, if necessary
+        if (playlist.users.indexOf(userID) < 0) {
+          Playlist.update(playlist._id, {$push: {'users': userID }});
+        }
+        return true;
+      }
+      else {
+        return false;
+      }
+    },
+
+
+    setPlaylistType: function(playlistID, newType) {
+      if (! (is('String', playlistID)  &&  is('String', newType) )) {
+        throw new Meteor.Error(400, 'Invalid data provided.');
+      }
+
+      if (playlistTypes.indexOf(newType) < 0) {
+        throw new Meteor.Error(400, 'Invalid data provided.');
+      }
+
+      var playlist = Playlist.findOne({'url': playlistID});
+
+      if (! playlist) {
+        throw new Meteor.Error(400, 'Invalid data provided.');
+      }
+
+      if (! this.userId) {
+        throw new Meteor.Error(403, 'No access allowed.');  
+      }
+
+      if (playlist.owner.indexOf(this.userId) < 0) {
+        throw new Meteor.Error(403, 'No access allowed.');
+      }
+
+      Playlist.update(playlist._id, {$set: {"type": newType}});
+    },
+
+
+    addUserToPlaylist: function(playlistID, userID) {
+      if (! (is('String', playlistID)  &&  is('String', userID) )) {
+        throw new Meteor.Error(400, 'Invalid data provided.');
+      }
+
+      var playlist = Playlist.findOne({'url': playlistID});
+      var newUser = Meteor.users.findOne(userID);
+
+      if ((! playlist) || (! newUser)) {
+        throw new Meteor.Error(400, 'Invalid data provided.');
+      }
+
+      // check the user has not already been added
+      if (playlist.users.indexOf(userID) >= 0) {
+        return false;
+      }
+
+      // check if there's at least an item added to the playlist by this user
+      if (Items.find({'playlistID': playlistID, 'addedBy': userID}).count() > 0) {
+        Playlist.update(playlist._id, {$push: {'users': userID }});
+      }
+      else {
+        throw new Meteor.Error(400, 'Invalid data provided.');
+      }
     }
   });
 
