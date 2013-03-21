@@ -209,6 +209,11 @@
   });
 
 
+  Meteor.publish("allUserData", function(users) {
+    return Meteor.users.find({'_id': {$in: users}}, {fields: {'username': 1}});
+  });
+
+
 })();
 
 

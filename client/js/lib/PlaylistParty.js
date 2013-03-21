@@ -20,6 +20,7 @@
       
       'onReady': function() {
         PlaylistParty.itemsHandle = Meteor.subscribe("items", playlistID, function() {
+          allUserData(playlistID);
           PlaylistParty.playlistID = playlistID;
           Session.set("playlistSet", true);
           Session.set("showCreatePlaylist", false);
@@ -34,6 +35,14 @@
       }
     });
   };
+
+  function allUserData (playlistID) {
+    Deps.autorun(function () {
+      var playlist = Playlist.find({'url': playlistID}).fetch();
+      Meteor.subscribe("allUserData", playlist[0].users);
+    });
+  }
+
 
 
   Accounts.ui.config({
