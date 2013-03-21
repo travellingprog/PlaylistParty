@@ -1,0 +1,210 @@
+Searching 53 files for "Items"
+
+/home/erick/work/playlistparty/client/js/boombox/boombox.js:
+  163  
+  164        this.prev = function() {
+  165:         if (Items.find({}).count() === 0) return;
+  166          if (! loop) {
+  167            if (playing) {
+  ...
+  177  
+  178        this.next = function() {
+  179:         if (Items.find({}).count() === 0) return;
+  180          if (! loop) {
+  181            if (playing) {
+  ...
+  252  
+  253        this.removeItem = function (item) {
+  254:         Items.remove(item._id, function (error) {
+  255            if (error) alert(error);
+  256          });
+
+/home/erick/work/playlistparty/client/js/boombox/listmanager/listManager.js:
+   41  
+   42  
+   43:     Items.find().observeChanges({
+   44        removed: function(id) {
+   45          frames.remove(id);
+
+/home/erick/work/playlistparty/client/js/boombox/listmanager/players/ScPlayer.js:
+   35          self.scplayer.bind(SC.Widget.Events.PLAY, function () {
+   36            if (self.boombox.curPlayerID() !== self._id) {
+   37:             var thisItem = Items.findOne({_id: self._id});
+   38              self.boombox.clickedPlayer(thisItem);
+   39            } 
+
+/home/erick/work/playlistparty/client/js/boombox/listmanager/players/YtPlayer.js:
+  108      if (newState === state.PLAYING) {
+  109        if (this.boombox.curPlayerID() !== this._id) {
+  110:         var thisItem = Items.findOne({_id: this._id});
+  111          this.boombox.clickedPlayer(thisItem);
+  112        } 
+
+/home/erick/work/playlistparty/client/js/controls.js:
+    7    // - boombox
+    8    // - Session.keys.controlsHidden
+    9:   // - Items collection
+   10    
+   11    var boombox = PlaylistParty.boombox;
+   ..
+  149    template.curTrack = function() {
+  150      if (! boombox.curPlayerID() ) return 0;
+  151:     var curItem = Items.findOne(boombox.curPlayerID());
+  152:     return Items.find({seqNo: {$lte: curItem.seqNo}}).count();
+  153    };
+  154  
+  155  
+  156    template.numTracks = function() {
+  157:     return Items.find({}).count();
+  158    };
+  159  
+
+/home/erick/work/playlistparty/client/js/lib/PlaylistParty.js:
+    7    Playlist = new Meteor.Collection("playlist");
+    8  
+    9:   Items = new Meteor.Collection("items");
+   10  
+   11  
+   ..
+   20        
+   21        'onReady': function() {
+   22:         PlaylistParty.itemsHandle = Meteor.subscribe("items", playlistID, function() {
+   23            PlaylistParty.playlistID = playlistID;
+   24            Session.set("playlistSet", true);
+
+/home/erick/work/playlistparty/client/js/player.js:
+    4  // Global variables used:
+    5  // - boombox
+    6: // - Items collection
+    7  
+    8  
+    .
+   35  
+   36    template.trackNo = function() {
+   37:     return Items.find({seqNo: {$lte: this.seqNo}}).count();
+   38    };
+   39  
+
+/home/erick/work/playlistparty/client/js/removeAllWarning.js:
+   11  
+   12      'click .btn-primary': function() {
+   13:       var itemsToRemove = Items.find({addedBy: 'user1'}).fetch();
+   14:       for (var i = itemsToRemove.length - 1; i >= 0; i--) {
+   15:         PlaylistParty.boombox.removeItem(itemsToRemove[i]);
+   16        };
+   17        Session.set("showRemoveAllWarning", false);
+
+/home/erick/work/playlistparty/client/js/search.js:
+   62      param["maxResults"] = 50;
+   63      param["part"] = "id, snippet";
+   64:     param["fields"] =  "items(id/videoId, ";
+   65      param["fields"] += "snippet(title, thumbnails/default/url))";
+   66  
+   ..
+   73        }
+   74  
+   75:       var resp = result.data.items;
+   76        var item, title, titleIndex, artist;
+   77  
+
+/home/erick/work/playlistparty/client/js/searchEngine.js:
+    4  // Global variables used:
+    5  // - Session.keys.searching
+    6: // - Items Collection
+    7  
+    8  
+    .
+  217  
+  218    var getNewSeqNo = function() {
+  219:     if (! Items.findOne({})) {
+  220        return 1;
+  221      } else {
+  222:       return parseInt(Items.findOne({},{sort: {seqNo: -1}}).seqNo) + 1;
+  223      }
+  224    };
+  ...
+  226  
+  227    var insertItem = function(item, seqNo) {
+  228:     Items.insert({
+  229        "playlistID" : PlaylistParty.playlistID, 
+  230        "type" : item.type, 
+
+/home/erick/work/playlistparty/client/js/tracks.js:
+    5  // - Session.key.YtAPIready
+    6  // - Session.key.ScAPIready
+    7: // - Items collection
+    8  
+    9  (function() {
+   ..
+   11    var template = Template.tracks;
+   12  
+   13:   template.noItems = function() {
+   14:     return (Items.find({}).count() === 0);
+   15    };
+   16    
+   ..
+   23  
+   24  
+   25:   template.items = function() {
+   26:     return Items.find({},{sort: {seqNo: 1}});
+   27    };
+   28  
+
+/home/erick/work/playlistparty/client/startup.js:
+    9  // - showTime function
+   10  // - onYouTubeIframeAPIReady function
+   11: // - Items collection
+   12  // - Playlist collection
+   13  //
+
+/home/erick/work/playlistparty/client/templates/options.html:
+   59      <h3>Deletion</h3>
+   60      <div class="subsection">
+   61:         <p><button id="removeAll" class="btn btn-danger">Remove All My Items</button></p>
+   62      </div>
+   63    </div>
+
+/home/erick/work/playlistparty/client/templates/removeAllWarning.html:
+    7    
+    8      <div class="modal-body">
+    9:       Are you sure that you want to remove all your items from the playlist?
+   10      </div>
+   11    
+
+/home/erick/work/playlistparty/client/templates/tracks.html:
+    2  
+    3    {{#isolate}}
+    4:   {{#if noItems}}
+    5      {{> instructions}}
+    6    {{/if}}
+    .
+    8        
+    9    {{#if APIsReady}}
+   10:     {{#each items}}
+   11        {{> player}}
+   12      {{/each}}
+
+/home/erick/work/playlistparty/server/server.js:
+    6    Playlist = new Meteor.Collection("playlist");
+    7  
+    8:   Items = new Meteor.Collection("items");
+    9  
+   10  
+   ..
+  161  
+  162        // check if there's at least an item added to the playlist by this user
+  163:       if (Items.find({'playlistID': playlistID, 'addedBy': userID}).count() > 0) {
+  164          Playlist.update(playlist._id, {$push: {'users': userID }});
+  165        }
+  ...
+  202  
+  203  
+  204:   Meteor.publish("items", function(playlistID) {
+  205      if (! is('String', playlistID)){
+  206        this.error(new Meteor.Error(400, 'Invalid data provided.'));
+  207      }
+  208:     return Items.find({"playlistID" : playlistID});
+  209    });
+  210  
+
+41 matches across 16 files

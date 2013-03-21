@@ -44,6 +44,12 @@
     return result;
   };
 
+  template.username = function() {
+    if (this.addedBy.length > 0) {
+      
+    }
+  };
+
   template.myItem = function () {
     return (this.addedBy === 'user1');
   };

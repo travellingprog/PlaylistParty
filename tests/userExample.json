@@ -1,0 +1,27 @@
+{ 
+  "createdAt" : 1363825052099, 
+  "_id" : "NLMiu2r5SFf7KDaWA", 
+  "services" : { 
+    "password" : { 
+      "srp" : { 
+        "identity" : "gtY9bJSg626z5hDmE", 
+        "salt" : "ifb2EexFtxdgKSqh7", 
+        "verifier" : "78b125558bfb6d1c5ac92717cb9e9350ff6b6fc4bec3a84d3ac4152f068646ce1c91bcbc7e613f417b96430cf89b66196381477cbf095db4443b3476a81370ca3d8cc7e0e8b303dc966ebe3dd8d0fa7e6e571ef76a3472362eccda9c93e2ca6a48351c6bd53e41d0c6bbafe237563541f1400a97e6600454b4bec9d0df97aa54" 
+      } 
+    }, 
+    "resume" : { 
+      "loginTokens" : 
+      [ { 
+        "token" : "uauejTtmkpAWk7neW", 
+        "when" : 1363825052099 
+      } ] 
+    } 
+  }, 
+  "username" : "erick3", 
+  "emails" : 
+  [ { 
+    "address" : "erick3@example.com", 
+    "verified" : false 
+  } ] 
+}
+

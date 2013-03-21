@@ -8,7 +8,6 @@
   Items = new Meteor.Collection("items");
 
 
-
   //////////////////////////////////////////////////////////////////////////////
   // playlist creation/modification
 
@@ -60,12 +59,19 @@
         }
       } while (! uniqueURL);
 
-      Playlist.insert({
+      var playlist_id = Playlist.insert({
         'name': name,
         'url': newURL,
         'password': false,
-        'public': true
+        'owner': [],
+        'type': 'anonymous',
+        'users': []
       });
+
+      if (this.userId) {
+        Playlist.update(playlist_id, {$push: {'owner': this.userId }});
+        Playlist.update(playlist_id, {$push: {'users': this.userId }});
+      }
 
       return newURL;
     },
@@ -109,6 +115,7 @@
 
 
     setPlaylistType: function(playlistID, newType) {
+      
       if (! (is('String', playlistID)  &&  is('String', newType) )) {
         throw new Meteor.Error(400, 'Invalid data provided.');
       }
