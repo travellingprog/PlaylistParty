@@ -73,7 +73,7 @@
     remove: function() { return true; }
   });
 
-  Meteor.users.deny({update: function () { return true; }});
+  // Meteor.users.deny({update: function () { return true; }});
 
 
 })();

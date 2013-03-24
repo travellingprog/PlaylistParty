@@ -70,6 +70,13 @@
       if (this.userId) {
         Playlist.update(playlist_id, {$push: {'owner': this.userId }});
         Playlist.update(playlist_id, {$push: {'users': this.userId }});
+
+        // Set this playlist as the first one in the user's profile
+        var userPlaylists = Meteor.users.findOne(this.userId).profile.playlists;
+        userPlaylists.splice(0,0,playlist_id);
+        userPlaylists = _.first(userPlaylists, 20);
+        Meteor.users.update(this.userId, 
+                            {$set: {'profile.playlists': userPlaylists}});
       }
 
       return newURL;
@@ -167,6 +174,18 @@
 
     return retValue;
   }
+
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  // User creation
+
+
+  // Make the profile only have a playlists array
+  Accounts.onCreateUser(function(options, user) {
+    user.profile = {playlists: []};
+    return user;
+  });
 
 
 
