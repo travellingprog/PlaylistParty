@@ -4,14 +4,14 @@
 // Global variables used:
 // - Session.key.YtAPIready
 // - Session.key.ScAPIready
-// - Items collection
 
 (function() {
 
   var template = Template.tracks;
 
   template.noItems = function() {
-    return (Items.find({}).count() === 0);
+    var playlist = Playlist.find().fetch();
+    return ((playlist.length > 0) && (playlist[0].items.length)) ? false : true;
   };
   
 
@@ -19,11 +19,11 @@
     if (! Session.get("YtAPIready")) return false;
     if (! Session.get("ScAPIready")) return false;
     return true;
-  }
+  };
 
 
   template.items = function() {
-    return Items.find({},{sort: {seqNo: 1}});
+    return Items.find();
   };
 
 })();

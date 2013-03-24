@@ -11,14 +11,14 @@
     "etc."
   ],
   "items": [
-    {
-      "type" : "YouTube",
-      "streamID" : "B5bFf2Bn9yI",
-      "artist" : "Kendrick Lamar",
-      "title" : "Bitch Don't Kill My Vibe (Instrumental) Reprod. Wonya Love",
-      "pic" : "https://i.ytimg.com/vi/B5bFf2Bn9yI/default.jpg",
-      "addedBy" : "user._id",
-      "id": "uniqueIDno"   // (new Meteor.Collection.ObjectID()).toHexString()
-    }
-  ]
+      {
+        "type" : "YouTube",
+        "streamID" : "B5bFf2Bn9yI",
+        "artist" : "Kendrick Lamar",
+        "title" : "Bitch Don't Kill My Vibe (Instrumental) Reprod. Wonya Love",
+        "pic" : "https://i.ytimg.com/vi/B5bFf2Bn9yI/default.jpg",
+        "addedBy" : "user._id",
+        "id": "uniqueIDno" // (new Meteor.Collection.ObjectID()).toHexString()
+      }
+  }]
 }

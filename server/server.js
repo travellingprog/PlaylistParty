@@ -5,8 +5,6 @@
 
   Playlist = new Meteor.Collection("playlist");
 
-  Items = new Meteor.Collection("items");
-
 
   //////////////////////////////////////////////////////////////////////////////
   // playlist creation/modification
@@ -63,9 +61,10 @@
         'name': name,
         'url': newURL,
         'password': false,
-        'owner': [],
         'type': 'anonymous',
-        'users': []
+        'owner': [],
+        'users': [],
+        'items': []
       });
 
       if (this.userId) {
@@ -99,18 +98,8 @@
       // TO DO: check that this call is coming from a current owner
       // of the playlist
 
-      if (playlist.owner.indexOf(userID) < 0) {
-        Playlist.update(playlist._id, {$push: {'owner': userID }});
-
-        // add to playlist users, if necessary
-        if (playlist.users.indexOf(userID) < 0) {
-          Playlist.update(playlist._id, {$push: {'users': userID }});
-        }
-        return true;
-      }
-      else {
-        return false;
-      }
+      Playlist.update(playlist._id, {$addToSet: {'owner': userID }});
+      Playlist.update(playlist._id, {$addToSet: {'users': userID }});
     },
 
 
@@ -147,25 +136,22 @@
         throw new Meteor.Error(400, 'Invalid data provided.');
       }
 
-      var playlist = Playlist.findOne({'url': playlistID});
-      var newUser = Meteor.users.findOne(userID);
-
-      if ((! playlist) || (! newUser)) {
+      // check if user exists
+      if (! Meteor.users.findOne(userID)) {
         throw new Meteor.Error(400, 'Invalid data provided.');
       }
 
-      // check the user has not already been added
-      if (playlist.users.indexOf(userID) >= 0) {
-        return false;
-      }
+      // check if playlist exists and has an item added by this user
+      var playlist = Playlist.findOne({
+        'url': playlistID, 
+        'items.addedBy': userID
+      });
 
-      // check if there's at least an item added to the playlist by this user
-      if (Items.find({'playlistID': playlistID, 'addedBy': userID}).count() > 0) {
-        Playlist.update(playlist._id, {$push: {'users': userID }});
-      }
-      else {
+      if (! playlist) {
         throw new Meteor.Error(400, 'Invalid data provided.');
       }
+
+      Playlist.update(playlist._id, {$addToSet: {'users': userID }});      
     }
   });
 
@@ -185,7 +171,7 @@
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // Publishing functoins
+  // Publishing functions
 
   
   Meteor.publish("playlist", function (playlistID) {
@@ -198,14 +184,6 @@
       this.error(new Meteor.Error(404, 'Unable to find any playlist with that ID.'));
     }
     return playlist;
-  });
-
-
-  Meteor.publish("items", function(playlistID) {
-    if (! is('String', playlistID)){
-      this.error(new Meteor.Error(400, 'Invalid data provided.'));
-    }
-    return Items.find({"playlistID" : playlistID});
   });
 
 

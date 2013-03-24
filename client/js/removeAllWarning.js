@@ -10,7 +10,7 @@
   Template.removeAllWarning.events({
 
     'click .btn-primary': function() {
-      var itemsToRemove = Items.find({addedBy: 'user1'}).fetch();
+      var itemsToRemove = _.where(Playlist.findOne().items, {addedBy: 'user1'});
       for (var i = itemsToRemove.length - 1; i >= 0; i--) {
         PlaylistParty.boombox.removeItem(itemsToRemove[i]);
       };

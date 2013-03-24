@@ -3,7 +3,6 @@
 //
 // Global variables used:
 // - Session.keys.searching
-// - Items Collection
 
 
 (function() {
@@ -162,12 +161,9 @@
 
 
     'click .addSelection' : function() {;
-      var newSeqNo = getNewSeqNo();
-      var sel = selection.get();
-      
+      var sel = selection.get();      
       for (var i = 0, l = sel.length; i < l; i++){
-        insertItem(sel[i], newSeqNo);
-        newSeqNo++;
+        insertItem(sel[i]);
       }
       closeSearch();
     },
@@ -182,8 +178,7 @@
     // results context
 
     'click .addItem' : function() {
-      var newSeqNo = getNewSeqNo();
-      insertItem(this, newSeqNo);
+      insertItem(this);
       closeSearch();
     },
 
@@ -215,25 +210,26 @@
   };
 
 
-  var getNewSeqNo = function() {
-    if (! Items.findOne({})) {
-      return 1;
-    } else {
-      return parseInt(Items.findOne({},{sort: {seqNo: -1}}).seqNo) + 1;
-    }
-  };
-
-
-  var insertItem = function(item, seqNo) {
-    Items.insert({
-      "playlistID" : PlaylistParty.playlistID, 
-      "type" : item.type, 
-      "streamID" : item.streamID,
-      "artist": item.artist,
-      "title": item.title,
-      "pic": item.pic,
-      "seqNo" : parseFloat(seqNo + "." + (new Date()).getTime()), 
-      "addedBy" : 'user1'
+  var insertItem = function(item) {
+    Playlist.update(
+    PlaylistParty.listID,
+    {
+      $push: 
+      { 
+        'items':
+        {
+          "type" : item.type,
+          "streamID" : item.streamID,
+          "artist": item.artist,
+          "title": item.title,
+          "pic": item.pic,
+          "addedBy": Meteor.userId(),
+          "id": (new Meteor.Collection.ObjectID()).toHexString()
+        }
+      }
+    },
+    function (error) {
+      if (error) alert(error);
     });
   };
 

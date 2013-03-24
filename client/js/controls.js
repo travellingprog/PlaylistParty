@@ -6,7 +6,6 @@
   // Global variables used here:
   // - boombox
   // - Session.keys.controlsHidden
-  // - Items collection
   
   var boombox = PlaylistParty.boombox;
 
@@ -147,14 +146,15 @@
 
 
   template.curTrack = function() {
-    if (! boombox.curPlayerID() ) return 0;
-    var curItem = Items.findOne(boombox.curPlayerID());
-    return Items.find({seqNo: {$lte: curItem.seqNo}}).count();
+    var curID = boombox.curPlayerID();
+    if (! curID ) return 0;
+    return (_.pluck(Playlist.findOne().items, 'id')).indexOf(curID) + 1;
   };
 
 
   template.numTracks = function() {
-    return Items.find({}).count();
+    var playlist = Playlist.find().fetch();
+    return (playlist.length > 0) ? playlist[0].items.length : 0;
   };
 
 

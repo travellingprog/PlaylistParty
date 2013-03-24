@@ -6,14 +6,14 @@
 
   var ScPlayer = function(id, streamID, pic, boombox) {
 
-    this._id = id;
+    this.id = id;
     this.pic = pic;
     this.scplayer = null;
     this.isReady = false;
     this.boombox = boombox;
     var self = this;
 
-    $('#' + this._id).replaceWith('<div id="' + this._id + '"></div>');
+    $('#' + this.id).replaceWith('<div id="' + this.id + '"></div>');
     SC.oEmbed(streamID, {maxwidth: '232px', maxheight: '200px', show_comments: false}, function(oEmbed) {
 
       var embedHTML = (oEmbed.html).replace('<iframe', '<iframe id="' + id + '"');
@@ -24,7 +24,7 @@
 
         self.isReady = true;
         self.scplayer.setVolume(self.boombox.getVolume());
-        if (self._id === self.boombox.curPlayerID()) {
+        if (self.id === self.boombox.curPlayerID()) {
           self.updateDuration();
           if (self.boombox.isPlaying()) {
             self.play();
@@ -33,9 +33,8 @@
 
 
         self.scplayer.bind(SC.Widget.Events.PLAY, function () {
-          if (self.boombox.curPlayerID() !== self._id) {
-            var thisItem = Items.findOne({_id: self._id});
-            self.boombox.clickedPlayer(thisItem);
+          if (self.boombox.curPlayerID() !== self.id) {
+            self.boombox.clickedPlayer(self.id);
           } 
           self.boombox.setPlaying(true, "fromPlayer");
         });

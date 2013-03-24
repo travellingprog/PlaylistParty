@@ -236,6 +236,7 @@ body {
   .player img {
     background-color: OrangeRed;
     max-width: 90%; 
+    border: 1px solid blue;
   }
 
   .player .player-bottom {

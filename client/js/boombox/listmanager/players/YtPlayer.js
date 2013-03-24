@@ -7,7 +7,7 @@
 
   var YtPlayer = function(id, streamID, pic, boombox) {
 
-    this._id = id;
+    this.id = id;
     this.pic = pic;
     this.streamID = streamID;
     this.isReady = false;
@@ -15,7 +15,7 @@
     var that = this;
     
 
-    $('#' + this._id).replaceWith('<div id="' + this._id + '"></div>');
+    $('#' + this.id).replaceWith('<div id="' + this.id + '"></div>');
     this.ytplayer = new YT.Player(id, {
       height: '200',
       width: '232',
@@ -91,7 +91,7 @@
     this.isReady = true;
     this.ytplayer.setPlaybackQuality('medium');
     this.setVolume(this.boombox.getVolume());
-    if (this._id === this.boombox.curPlayerID()) {
+    if (this.id === this.boombox.curPlayerID()) {
       this.updateDuration();
       if (this.boombox.isPlaying()) {
         this.play();
@@ -106,15 +106,14 @@
     var state = YT.PlayerState;
 
     if (newState === state.PLAYING) {
-      if (this.boombox.curPlayerID() !== this._id) {
-        var thisItem = Items.findOne({_id: this._id});
-        this.boombox.clickedPlayer(thisItem);
+      if (this.boombox.curPlayerID() !== this.id) {
+        this.boombox.clickedPlayer(this.id);
       } 
       this.boombox.setPlaying(true, "fromPlayer");
       return;
     }
 
-    if (this.boombox.curPlayerID() !== this._id) return;
+    if (this.boombox.curPlayerID() !== this.id) return;
 
     if (newState === state.PAUSED) {
       this.boombox.setPlaying(false, "fromPlayer");

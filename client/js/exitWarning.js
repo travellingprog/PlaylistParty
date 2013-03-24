@@ -6,7 +6,7 @@
 
 
   Template.exitWarning.url = function() {
-    return 'http://' + window.location.host + '/' + PlaylistParty.playlistID;
+    return 'http://' + window.location.host + '/' + PlaylistParty.playlistURL;
   };
   
   Template.exitWarning.events({

@@ -15,7 +15,7 @@
 
     var curPlayer, prevPlayer, nextPlayer, livePlayers;
     var shuffle, shuffleSequence;
-    var frames = new Meteor.Collection(null);
+    var frames;
     var curFrame;
     var timeoutID;
     var scroll;
@@ -31,48 +31,57 @@
       livePlayers = [];
       shuffle = false;
       shuffleSequence = [];
+      frames = [];
       curFrame = null;
       timeoutID = null;
       scroll = true;
     }
 
+
     ////////////////////////////////////////////////////////////////////////////
     // Follow the addition and removal of frames
+    
+    this.remove = function(id) {
+      if (frames.indexOf(id) < 0) return;
 
-
-    Items.find().observeChanges({
-      removed: function(id) {
-        frames.remove(id);
-        if (frames.find().count() > 0) 
-        {
-          if (shuffle) removeFromShuffle(id);
-          removeFromLivePlayers(id);
-          if (curPlayer && curPlayer._id === id) {
-            boombox.setCurPlayer('curPlayerRemoved');  
-            self.next()
-          }
-          else {
-            scroll = false;
-            self.setNextPlayer();    
-          }          
-           
-        }
-        else 
-        {
-          if (timeoutID) clearTimeout(timeoutID);
-          initialize();
-          boombox.setCurPlayer('none');
-        }        
+      // if we are removing the curPlayer, be ready to go to the next frame.
+      if (curFrame === id) {
+        boombox.setCurPlayer('curPlayerRemoved');  
+        var nextFrame = getNextFrame();
       }
-    });
+
+      // remove this from our list of frames
+      frames = _.without(frames, id);
+
+      // check if we have any frames left, act accordingly
+      if (frames.length > 0) 
+      {
+        if (shuffle) removeFromShuffle(id);
+        removeFromLivePlayers(id);
+        if (nextFrame) {
+          self.setCurFrame(nextFrame);
+        }
+        else {
+          scroll = false;
+          self.setNextPlayer();    
+        }          
+         
+      }
+      else 
+      {
+        if (timeoutID) clearTimeout(timeoutID);
+        initialize();
+        boombox.setCurPlayer('none');
+      }        
+    };
 
 
-    this.add = function(item) {
+    this.add = function(id) {
       scroll = false;
-      frames.insert(item);
-      if (shuffle) addToShuffle(item._id);
+      frames.push(id);
+      if (shuffle) addToShuffle(id);
       if (! curFrame) {
-        this.setCurFrame(item);
+        this.setCurFrame(id);
       } else {
         this.setNextPlayer();
       }
@@ -83,13 +92,14 @@
     // the "set new current player" process
     //
     // It has been split into various functions, with timeouts in between,
-    // to make it possible to cancel halt the process if the player quickly
+    // to make it possible to halt the process if the player quickly
     // moves to another player (e.g. by quickly pressing the Next/Prev buttons)
 
 
-    this.setCurFrame = function (item) {
-      curFrame = item;
-      boombox.setCurFrame(curFrame);
+    // Sets the current frame, which will get blue highlight and be scrolled to.
+    this.setCurFrame = function (id) {
+      curFrame = id;
+      boombox.setCurFrameID(curFrame);
 
       // cancel any current execution of this process
       if (timeoutID) clearTimeout(timeoutID);
@@ -97,7 +107,7 @@
       // scroll to current frame
       if (activeTab === '#tracks') {
         var firstPOffset = $('.player :first').offset().top;
-        var newOffset = $('#' + curFrame._id).parent().offset().top - firstPOffset;
+        var newOffset = $('#' + curFrame).parent().offset().top - firstPOffset;
         $('html, body').animate({scrollTop: newOffset}, 400);
       }
 
@@ -107,6 +117,7 @@
     };
 
 
+    // Creates the media player for the current frame
     this.setCurPlayer = function () {
       curPlayer = createPlayer(curFrame);
       curPlayer.setVolume(boombox.getVolume());
@@ -117,6 +128,7 @@
     };
 
 
+    // Creates the media player for the track that plays next
     this.setNextPlayer = function () {
       nextPlayer = createPlayer(getNextFrame());
       timeoutID = setTimeout( function() {
@@ -125,6 +137,7 @@
     };
 
 
+    // Creates the media player for the previous track
     this.setPrevPlayer = function () {
       prevPlayer = createPlayer(getPrevFrame());
       if (scroll && (activeTab === '#tracks'))
@@ -139,11 +152,12 @@
         timeoutID = setTimeout( function() {
           self.setPictures();
         }, 5000);
-      }
-      
+      }      
     };
 
 
+    // Scrolls to the current media item, because rendering the 
+    // adjacent players may have shifted things around.
     this.scrollToCurPlayer = function() {
       if (! curPlayer) return;
 
@@ -152,7 +166,7 @@
       if (prevPlayer.isReady && nextPlayer.isReady) 
       {
         var firstPOffset = $('.player :first').offset().top;
-        var newOffset = $('#' + curPlayer._id).parent().offset().top - firstPOffset;
+        var newOffset = $('#' + curPlayer.id).parent().offset().top - firstPOffset;
         $('html, body').animate({scrollTop: newOffset}, 400);
         timeoutID = setTimeout( function() {
           self.setPictures();
@@ -167,16 +181,16 @@
     };
 
 
+    // replace any live player we don't need with a picture
     this.setPictures = function() {
       if (! curPlayer) return;
 
-      // any live player we don't need, replace it with a picture
       var keep;
       for (var i = livePlayers.length - 1; i >= 0; i--) {
         keep = false;
-        if (livePlayers[i]._id === curPlayer._id) keep = true;
-        if (livePlayers[i]._id === nextPlayer._id) keep = true;
-        if (livePlayers[i]._id === prevPlayer._id) keep = true;
+        if (livePlayers[i].id === curPlayer.id) keep = true;
+        if (livePlayers[i].id === nextPlayer.id) keep = true;
+        if (livePlayers[i].id === prevPlayer.id) keep = true;
         
         if (! keep) {
           setToPicture (livePlayers[i]);
@@ -191,69 +205,52 @@
     // livePlayers is an array with the all currently existing players.
 
 
-    function createPlayer (frame) {
-      if (! frame) return null;
+    function createPlayer (id) {
+      if (! id) return null;
 
       // check that we haven't already built this player
-      if ($('#' + frame._id + ' img').length) 
+      if ($('#' + id + ' img').length) 
       {
+        var info = _.find(PlaylistParty.items(), function(item) {
+          return item.id === id;
+        });
+
         var newPlayer;
-        if (frame.type === 'YouTube') {
-          newPlayer = createYtPlayer(frame._id, frame.streamID, frame.pic, boombox);
-        } else if (frame.type === 'SoundCloud') {
-          newPlayer = createScPlayer(frame._id, frame.streamID, frame.pic, boombox);
+        if (info.type === 'YouTube') {
+          newPlayer = createYtPlayer(info.id, info.streamID, info.pic, boombox);
+        } else if (info.type === 'SoundCloud') {
+          newPlayer = createScPlayer(info.id, info.streamID, info.pic, boombox);
         }
         livePlayers.push(newPlayer);
         return newPlayer;
       }
       else 
       {
-        for (var i = 0, l = livePlayers.length; i < l; i++) {
-          if ((frame._id) === livePlayers[i]._id) {
-            return livePlayers[i];
-          }
-        }
+        return _.find(livePlayers, function(player) {
+          return id === player.id;
+        });
       }
     }
     
 
     function setToPicture(player) {
       // don't load pic if it's already there
-      if ($('#' + player._id + ' img').length) return;
+      if ($('#' + player.id + ' img').length) return;
 
-      $('#' + player._id).replaceWith('<div id="' + player._id + '"></div>');
-      $('#' + player._id).html('<a class="pic" href="/"><img src="' + 
+      $('#' + player.id).replaceWith('<div id="' + player.id + '"></div>');
+      $('#' + player.id).html('<a class="pic" href="/"><img src="' + 
                                    player.pic +'" width="232px"></a>');
     }
 
 
     function removeFromLivePlayers (id) {
       for (var i = livePlayers.length - 1; i >= 0; i--) {
-        if (livePlayers[i]._id === id) {
+        if (livePlayers[i].id === id) {
           livePlayers.splice(i, 1);
           break;
         }
       }
     }
-
-
-    ////////////////////////////////////////////////////////////////////////////
-    // The current frame and player at this time
-    // NOTE: a Deps.autorun within boombox did not seem to detect 
-    // these dependencies
-
-
-
-    // this.currentFrame = function() {
-    //   Deps.Dependency(curFrameDeps);
-    //   return curFrame;
-    // };
-
-
-    // this.currentPlayer = function() {
-    //   Deps.Dependency(curPlayerDeps);
-    //   return curPlayer;
-    // };
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -274,14 +271,14 @@
       if (! curFrame) return null;
 
       if (!shuffle) {
-        var nextFrame = frames.findOne({seqNo: {$gt: curFrame.seqNo}}, 
-                                     {sort: {seqNo: 1}});
-        if (! nextFrame) nextFrame = frames.findOne({}, {sort: {seqNo: 1}}); 
+        var i = frames.indexOf(curFrame) + 1;
+        if (i === frames.length) i = 0;
+        var nextFrame = frames[i];
       }
       else {
-        var i = shuffleSequence.indexOf(curFrame._id) + 1;
+        i = shuffleSequence.indexOf(curFrame) + 1;
         if (i === shuffleSequence.length) i = 0;
-        nextFrame = frames.findOne({_id: shuffleSequence[i]});
+        nextFrame = shuffleSequence[i];
       }
       return nextFrame;
     }
@@ -291,14 +288,14 @@
       if (! curFrame) return null;
 
       if (!shuffle) {
-        var prevFrame = frames.findOne({seqNo: {$lt: curFrame.seqNo}}, 
-                                       {sort: {seqNo: -1}});
-        if (! prevFrame) prevFrame = frames.findOne({}, {sort: {seqNo: -1}})
+        var i = frames.indexOf(curFrame) - 1;
+        if (i === -1) i = frames.length - 1;
+        var prevFrame = frames[i];
       }
       else {
-        var i = shuffleSequence.indexOf(curFrame._id) - 1;
+        i = shuffleSequence.indexOf(curFrame) - 1;
         if (i === -1) i = shuffleSequence.length - 1;
-        prevFrame = frames.findOne({_id: shuffleSequence[i]});
+        prevFrame = shuffleSequence[i];
       }
       return prevFrame;
     }
@@ -310,21 +307,14 @@
 
     this.setShuffle = function(s) {
       shuffle = s;
-      shuffleSequence = [];
       
       if (shuffle) {
         // create shuffle sequence
-        var framesArray = frames.find().fetch();
-        var randNo, randFrame;
-
-        for (i = framesArray.length - 1; i >= 0; i--) {
-          randNo = Math.floor(Math.random() * i);
-          randFrame = (framesArray.splice(randNo, 1))[0];
-          shuffleSequence.push(randFrame._id);
-        }
+        shuffleSequence = _.shuffle(frames);
       }
+
       // update live players
-      if (frames.find().count() > 0) {
+      if (frames.length > 0) {
         this.setNextPlayer();  
       }      
     };
@@ -337,7 +327,7 @@
 
 
     function removeFromShuffle (id) {
-      shuffleSequence.splice(shuffleSequence.indexOf(id), 1);
+      shuffleSequence = _.without(shuffleSequence, id);
     }
 
   };

@@ -11,7 +11,7 @@
     var playing, shuffle, loop;
     var curTime, curTimeLabel, totalTime;
     var volume;
-    var curFrame, curPlayer, oldCurPlayer;
+    var curFrameID, curPlayer, oldCurPlayer;
     this.pauseUpdates = false;
     var reset;
     var listManager = PlaylistParty.createListManager(this);
@@ -30,7 +30,7 @@
         curTimeLabel = 0;
         totalTime = 0;
         volume = 80;
-        curFrame = null;
+        curFrameID = null;
         curPlayer = null;
         reset = true;
         this.pauseUpdates = false;
@@ -52,6 +52,7 @@
         setTimeout(that.updatePlayerInfo, 500);
       };
       this.updatePlayerInfo();
+
 
       //////////////////////////////////////////////////////////////////////////
       // playback settings
@@ -110,7 +111,7 @@
       this.curPlayerID = function() {
         Deps.depend(BoomboxDeps['curPlayer']);
         if (! curPlayer) return false;
-        return curPlayer._id;     
+        return curPlayer.id;     
       };
 
       this.setCurPlayer = function (player) {
@@ -147,12 +148,12 @@
 
       this.curFrameID = function () {
         Deps.depend(BoomboxDeps['curFrame']);
-        if (! curFrame) return false;
-        return curFrame._id;
+        if (! curFrameID) return false;
+        return curFrameID;
       };
 
-      this.setCurFrame = function (frame) {
-        curFrame = frame;
+      this.setCurFrameID = function (id) {
+        curFrameID = id;
         BoomboxDeps['curFrame'].changed();
       };     
 
@@ -162,7 +163,7 @@
 
 
       this.prev = function() {
-        if (Items.find({}).count() === 0) return;
+        if (Playlist.findOne().items.length === 0) return;
         if (! loop) {
           if (playing) {
             oldCurPlayer = curPlayer;
@@ -176,7 +177,7 @@
       };
 
       this.next = function() {
-        if (Items.find({}).count() === 0) return;
+        if (Playlist.findOne().items.length === 0) return;
         if (! loop) {
           if (playing) {
             oldCurPlayer = curPlayer;
@@ -246,31 +247,49 @@
       //////////////////////////////////////////////////////////////////////////
       // playlist functions
 
-      this.itemAdded = function (item) {
-        listManager.add(item);
+      this.playerAdded = function (id) {
+        listManager.add(id);
+      };
+
+      this.playerDestroyed = function (id) {
+        listManager.remove(id);
       };
 
       this.removeItem = function (item) {
-        Items.remove(item._id, function (error) {
+        // Must remove the '_id' key given to this item in the local
+        // Items collection, or our Playlist will not recognize the item.
+        item = _.omit(item, '_id');
+
+        // remove this item from the Playlist.items array
+        Playlist.update(
+        PlaylistParty.listID, 
+        {
+          $pull: 
+          { 
+            'items': item
+          }
+        },
+        function (error) {
           if (error) alert(error);
         });
       };
 
-      this.clickedPicture = function(frame) {
+
+      this.clickedPicture = function(id) {
         if (playing) {
           oldCurPlayer = curPlayer;  // to pause later
         }
         // clicking pic should always auto-play
         this.setPlaying(true, "fromPicture");
-        listManager.setCurFrame(frame);        
+        listManager.setCurFrame(id);
       };
 
-      this.clickedPlayer = function(frame) {
+      this.clickedPlayer = function(id) {
         if (playing) {
           oldCurPlayer = curPlayer;  // to pause later
         }
         reset = false;
-        listManager.setCurFrame(frame);
+        listManager.setCurFrame(id);
       };
       
 

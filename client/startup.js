@@ -8,7 +8,6 @@
 // Global variables defined here:
 // - showTime function
 // - onYouTubeIframeAPIReady function
-// - Items collection
 // - Playlist collection
 //
 // Global variables used here:

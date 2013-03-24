@@ -3,7 +3,6 @@
 //
 // Global variables used:
 // - boombox
-// - Items collection
 
 
 (function() {
@@ -22,19 +21,24 @@
 
   template.rendered = function() {
     if (this.newItem) {
-      $('#' + this.data._id).replaceWith('<div id="' + this.data._id + '"></div>');
-      $('#' + this.data._id).html('<a class="pic" href="/"><img src="' + this.data.pic +'" width="232px"></a>');
-      boombox.itemAdded(this.data);
+      $('#' + this.data.id).replaceWith('<div id="' + this.data.id + '"></div>');
+      $('#' + this.data.id).html('<a class="pic" href="/"><img src="' + this.data.pic +'" width="232px"></a>');
+      boombox.playerAdded(this.data.id);
       this.newItem = false;
     }
   };
 
+  template.destroyed = function() {
+    boombox.playerDestroyed(this.data.id);
+  };
+
   template.isCurrentFrame = function () {
-    return (this._id === boombox.curFrameID()) ? 'current' : '';
+    return (this.id === boombox.curFrameID()) ? 'current' : '';
   };
 
   template.trackNo = function() {
-    return Items.find({seqNo: {$lte: this.seqNo}}).count();
+    var items = Playlist.find().fetch()[0].items;
+    return (_.pluck(items, 'id')).indexOf(this.id) + 1;
   };
 
   template.description = function() {
@@ -45,13 +49,12 @@
   };
 
   template.username = function() {
-    if (this.addedBy.length > 0) {
-      
-    }
+    return (this.addedBy) ? 
+      Meteor.users.findOne(this.addedBy).username : 'anonymous';
   };
 
   template.myItem = function () {
-    return (this.addedBy === 'user1');
+    return (this.addedBy === Meteor.userId());
   };
 
   template.events({
@@ -61,7 +64,7 @@
 
     'click a.pic' : function(e) {
       e.preventDefault();
-      boombox.clickedPicture(this);
+      boombox.clickedPicture(this.id);
     }
   });
 
