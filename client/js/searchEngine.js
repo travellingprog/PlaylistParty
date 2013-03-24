@@ -223,7 +223,7 @@
           "artist": item.artist,
           "title": item.title,
           "pic": item.pic,
-          "addedBy": Meteor.userId(),
+          "addedBy": Meteor.userId() || '',
           "id": (new Meteor.Collection.ObjectID()).toHexString()
         }
       }

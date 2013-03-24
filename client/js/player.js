@@ -49,8 +49,15 @@
   };
 
   template.username = function() {
-    return (this.addedBy) ? 
-      Meteor.users.findOne(this.addedBy).username : 'anonymous';
+    var result = '';
+    if (this.addedBy) {
+      var user = Meteor.users.findOne(this.addedBy);
+      if (user)  result += '<span class="userID">' + user.username + '</span>';
+    }
+    else {
+      result += '<span class="anon">anonymous</span>';
+    }
+    return result;
   };
 
   template.myItem = function () {

@@ -251,6 +251,11 @@ body {
     font-weight: bold;
   }
 
+  .player .anon {
+    color: black;
+    font-weight: bold;
+  }
+
   .remItem {
     color: red;
     font-size: 75%;
