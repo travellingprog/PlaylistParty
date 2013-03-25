@@ -166,6 +166,13 @@ body {
   }
 
 
+/* newPlaylistAlert modal */
+
+  #newPlaylistAlert h3{
+    color: blue;
+  }
+
+
 /* options */
 
   #options h2{

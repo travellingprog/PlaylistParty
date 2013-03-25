@@ -245,7 +245,7 @@
 
 
       //////////////////////////////////////////////////////////////////////////
-      // playlist functions
+      // player and item functions
 
       this.playerAdded = function (id) {
         listManager.add(id);
@@ -253,6 +253,59 @@
 
       this.playerDestroyed = function (id) {
         listManager.remove(id);
+      };
+
+      this.insertItem = function(item) {
+        var userID = Meteor.userId();
+
+        Playlist.update(
+        PlaylistParty.listID,
+        {
+          $push: 
+          { 
+            'items':
+            {
+              "type" : item.type,
+              "streamID" : item.streamID,
+              "artist": item.artist,
+              "title": item.title,
+              "pic": item.pic,
+              "addedBy": userID || '',
+              "id": (new Meteor.Collection.ObjectID()).toHexString()
+            }
+          }
+        },
+        function (error) {
+          if (error) alert(error);
+          return;
+        });
+
+        if (userID) {
+          // Set this playlist as the first one in the user's profile
+          var myPlaylists = Meteor.user().profile.playlists;
+          if (myPlaylists[0] !== PlaylistParty.listID) 
+          {
+            myPlaylists = _.without(myPlaylists, PlaylistParty.listID);
+            myPlaylists.splice(0,0,PlaylistParty.listID);
+            myPlaylists = _.first(myPlaylists, 20);
+            Meteor.users.update(userID, 
+                                {$set: {'profile.playlists': myPlaylists}});  
+          }
+          
+          if (Playlist.findOne().owner.length === 0) 
+          {
+            // If this playlist has no owner, set this user as the owner
+            Meteor.call('addOwner', PlaylistParty.listID, userID);
+            // ... and ask if anonymous users should be allowed
+            Template.newPlaylistAlert.setOwnerNotice();
+            Session.set("showNewPlaylistAlert", true);
+          }
+          else if (Playlist.findOne().users.indexOf(userID) < 0)
+          {
+            // ..else, just make sure this user is in the playlist's Users array
+            Meteor.call('addUserToPlaylist', PlaylistParty.listID, userID);  
+          }
+        }
       };
 
       this.removeItem = function (item) {

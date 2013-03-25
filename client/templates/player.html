@@ -9,12 +9,12 @@
       {{/constant}}
       <div class="player-bottom">
         added by {{{username}}}<br>
-        {{#if myItem}}
-          <button type="button" class="remItem btn btn-link">remove</button>
+        {{#if myItem_Or_AnonymousItem}}
+          <button type="button" class="remItem btn btn-link" style="float: left">remove</button>
         {{else}}
           <button type="button" class="btn btn-mini btn-success" style="float: left"><i class="icon-thumbs-up icon-white"></i> Nice!</button>
-          <p class="text-right">0 <i class="icon-thumbs-up"></i></p>
         {{/if}}
+        <p class="text-right">0 <i class="icon-thumbs-up"></i></p>        
       </div>
     </div>
   </div>

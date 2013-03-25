@@ -41,8 +41,11 @@
         PlaylistParty.listID = Playlist.findOne()._id;
         trackItems();
         Session.set("playlistSet", true);
-        Session.set("showCreatePlaylist", false);
         window.parent.document.title = "Playlist Party - " + Playlist.findOne().name;
+        if (Session.get("showCreatePlaylist")) {
+          Session.set("showCreatePlaylist", false);
+          Session.set("showNewPlaylistAlert", true);  
+        }
       },
 
       'onError': function(error) {

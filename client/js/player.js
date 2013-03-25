@@ -60,8 +60,8 @@
     return result;
   };
 
-  template.myItem = function () {
-    return (this.addedBy === Meteor.userId());
+  template.myItem_Or_AnonymousItem = function () {
+    return ((this.addedBy === Meteor.userId()) || (this.addedBy === ''));
   };
 
   template.events({

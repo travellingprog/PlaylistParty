@@ -14,7 +14,13 @@
       });
     },
 
-    'click #removeAll': function() {
+    'click #removeAllMine': function() {
+      Template.removeAllWarning.setType("myItems");
+      Session.set("showRemoveAllWarning", true);
+    },
+
+    'click #removeAllAnon': function() {
+      Template.removeAllWarning.setType("anonItems");
       Session.set("showRemoveAllWarning", true);
     }
   })

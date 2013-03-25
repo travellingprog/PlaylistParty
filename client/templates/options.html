@@ -56,9 +56,12 @@
         I'm a <strong>currently unemployed</strong> web developer. I made this mainly to showcase my skills... but also because it's a ton of fun to use! And I would love to hear from you! E-mail me at <strong><a href="mailto:e.cardenasmendez@gmail.com">e.cardenasmendez@gmail.com</a></strong>.
       </div>
     </div>
-    <h3>Deletion</h3>
-    <div class="subsection">
-        <p><button id="removeAll" class="btn btn-danger">Remove All My Items</button></p>
-    </div>
+    {{#if currentUser}}
+      <h3>Deletion</h3>
+      <div class="subsection">
+          <p><button id="removeAllMine" class="btn btn-danger">Remove All My Items</button></p>
+          <p><button id="removeAllAnon" class="btn btn-danger">Remove All Anonymous Items</button></p>
+      </div>
+    {{/if}}
   </div>
 </template>

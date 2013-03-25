@@ -36,5 +36,13 @@
     return Session.get("showRemoveAllWarning");
   };
 
+  template.showNewPlaylistAlert = function() {
+    return Session.get("showNewPlaylistAlert");
+  };
+
+  template.showNotAllowedByAnon = function() {
+    return Session.get("showNotAllowedByAnon");
+  };
+
 })();
 

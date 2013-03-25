@@ -161,9 +161,15 @@
 
 
     'click .addSelection' : function() {;
+      // if anonymous user, check if adding items is allowed
+      if ((! Meteor.userId()) && (Playlist.findOne().type !== 'anonymous')) {
+        Session.set("showNotAllowedByAnon", true);
+        return;
+      }; 
+
       var sel = selection.get();      
       for (var i = 0, l = sel.length; i < l; i++){
-        insertItem(sel[i]);
+        PlaylistParty.boombox.insertItem(sel[i]);
       }
       closeSearch();
     },
@@ -178,7 +184,13 @@
     // results context
 
     'click .addItem' : function() {
-      insertItem(this);
+      // if anonymous user, check if adding items is allowed
+      if ((! Meteor.userId()) && (Playlist.findOne().type !== 'anonymous')) {
+        Session.set("showNotAllowedByAnon", true);
+        return;
+      }; 
+
+      PlaylistParty.boombox.insertItem(this);
       closeSearch();
     },
 
@@ -207,40 +219,6 @@
       var logoPos = $('#logo' + name).offset().top;
       var topPos = $('#searchTop').offset().top;
       $('html, body').scrollTop(logoPos - topPos);
-  };
-
-
-  var insertItem = function(item) {
-    Playlist.update(
-    PlaylistParty.listID,
-    {
-      $push: 
-      { 
-        'items':
-        {
-          "type" : item.type,
-          "streamID" : item.streamID,
-          "artist": item.artist,
-          "title": item.title,
-          "pic": item.pic,
-          "addedBy": Meteor.userId() || '',
-          "id": (new Meteor.Collection.ObjectID()).toHexString()
-        }
-      }
-    },
-    function (error) {
-      if (error) alert(error);
-    });
-    if (Meteor.user()) {
-      // Set this playlist as the first one in the user's profile
-      var myPlaylists = Meteor.user().profile.playlists;
-      if (myPlaylists[0] === PlaylistParty.listID) return;
-      myPlaylists = _.without(myPlaylists, PlaylistParty.listID);
-      myPlaylists.splice(0,0,PlaylistParty.listID);
-      myPlaylists = _.first(myPlaylists, 20);
-      Meteor.users.update(Meteor.userId(), 
-                          {$set: {'profile.playlists': myPlaylists}});
-    }
   };
 
 

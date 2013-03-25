@@ -92,7 +92,7 @@
         throw new Meteor.Error(400, 'Invalid data provided.');
       }
 
-      var playlist = Playlist.findOne({'url': playlistID});
+      var playlist = Playlist.findOne(playlistID);
       var newOwner = Meteor.users.findOne(userID);
 
       if ((! playlist) || (! newOwner)) {
@@ -105,8 +105,8 @@
       // TO DO: check that this call is coming from a current owner
       // of the playlist
 
-      Playlist.update(playlist._id, {$addToSet: {'owner': userID }});
-      Playlist.update(playlist._id, {$addToSet: {'users': userID }});
+      Playlist.update(playlistID, {$addToSet: {'owner': userID }});
+      Playlist.update(playlistID, {$addToSet: {'users': userID }});
     },
 
 
@@ -120,7 +120,7 @@
         throw new Meteor.Error(400, 'Invalid data provided.');
       }
 
-      var playlist = Playlist.findOne({'url': playlistID});
+      var playlist = Playlist.findOne(playlistID);
 
       if (! playlist) {
         throw new Meteor.Error(400, 'Invalid data provided.');
@@ -134,7 +134,7 @@
         throw new Meteor.Error(403, 'No access allowed.');
       }
 
-      Playlist.update(playlist._id, {$set: {"type": newType}});
+      Playlist.update(playlistID, {$set: {"type": newType}});
     },
 
 
@@ -150,7 +150,7 @@
 
       // check if playlist exists and has an item added by this user
       var playlist = Playlist.findOne({
-        'url': playlistID, 
+        '_id': playlistID, 
         'items.addedBy': userID
       });
 
@@ -158,7 +158,7 @@
         throw new Meteor.Error(400, 'Invalid data provided.');
       }
 
-      Playlist.update(playlist._id, {$addToSet: {'users': userID }});      
+      Playlist.update(playlistID, {$addToSet: {'users': userID }});      
     }
   });
 
