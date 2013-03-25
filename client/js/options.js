@@ -27,12 +27,30 @@
     },
 
     'click #changeAnonStatus': function() {
-      if (Playlist.findOne().type === 'anonymous') {
-        Meteor.call('setPlaylistType', PlaylistParty.listID, 'publicUsers');
+      if (Playlist.findOne().type === 'anonymous') 
+      {
+        Meteor.call('setPlaylistType', PlaylistParty.listID, 'publicUsers', function (error) {
+          if (error) alert(error);
+        });
       }
-      else if (Playlist.findOne().type === 'publicUsers') {
-        Meteor.call('setPlaylistType', PlaylistParty.listID, 'anonymous');
+      else if (Playlist.findOne().type === 'publicUsers') 
+      {
+        Meteor.call('setPlaylistType', PlaylistParty.listID, 'anonymous', function (error) {
+          if (error) alert(error);
+        });
       }
+    },
+
+    'click .viewMyPlaylists': function() {
+      Meteor.call('getMyPlaylistsInfo', function(error, result) {
+        if (error) {
+          alert(error);
+        } 
+        else {
+          Template.userPlaylists.list = result;
+          Session.set("showUserPlaylists", true);
+        }
+      });
     },
 
     'click #removeAllMine': function() {

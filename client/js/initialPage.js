@@ -20,7 +20,19 @@
   Template.initialPage.events({
     'click #launchCreation': function() {
       Session.set('showCreatePlaylist', true);
-    }
+    },
+
+    'click .viewMyPlaylists': function() {
+      Meteor.call('getMyPlaylistsInfo', function(error, result) {
+        if (error) {
+          alert(error);
+        } 
+        else {
+          Template.userPlaylists.list = result;
+          Session.set("showUserPlaylists", true);
+        }
+      });
+    },
   });
 
 })();

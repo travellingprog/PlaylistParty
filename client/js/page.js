@@ -44,5 +44,9 @@
     return Session.get("showNotAllowedByAnon");
   };
 
+  template.showUserPlaylists = function() {
+    return Session.get("showUserPlaylists");
+  };
+
 })();
 

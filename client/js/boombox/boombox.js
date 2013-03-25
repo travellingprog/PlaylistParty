@@ -325,6 +325,20 @@
         function (error) {
           if (error) alert(error);
         });
+
+        var userID = Meteor.userId();
+        if (userID) {
+          // Set this playlist as the first one in the user's profile
+          var myPlaylists = Meteor.user().profile.playlists;
+          if (myPlaylists[0] !== PlaylistParty.listID) 
+          {
+            myPlaylists = _.without(myPlaylists, PlaylistParty.listID);
+            myPlaylists.splice(0,0,PlaylistParty.listID);
+            myPlaylists = _.first(myPlaylists, 20);
+            Meteor.users.update(userID, 
+                                {$set: {'profile.playlists': myPlaylists}});  
+          }
+        }
       };
 
 

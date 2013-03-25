@@ -178,13 +178,31 @@
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // User creation
+  // User creation and personal list of playlists
 
 
   // Make the profile only have a playlists array
   Accounts.onCreateUser(function(options, user) {
     user.profile = {playlists: []};
     return user;
+  });
+
+  Meteor.methods({
+    'getMyPlaylistsInfo': function() {
+      if (! this.userId) {
+        throw new Meteor.Error(400, 'Invalid data provided.');
+      }
+
+      var result = [];
+      var playlistIDs = Meteor.users.findOne(this.userId).profile.playlists;
+
+      for (var i = 0, l = playlistIDs.length; i < l; i++) {
+        var playlist = Playlist.findOne(playlistIDs[i]);
+        result.push({'name': playlist.name, 'url': playlist.url});
+      }
+
+      return result;
+    }
   });
 
 

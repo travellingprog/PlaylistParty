@@ -58,7 +58,7 @@
     </div>
     <h3>Playlist Info</h3>
     <div class="subsection">
-      <p><small>Note: Only the playlist owner(s) can change these settings.</small></p>
+      <p><small><em>Note: Only the playlist owner(s) can change these settings.</em></small></p>
       <p>
         Anonymous users are allowed to add music/videos: 
         <strong>{{anonStatus}} </strong>
@@ -68,6 +68,10 @@
       </p>
     </div>
     {{#if currentUser}}
+      <h3>User Info</h3>
+      <div class="subsection">
+        <button class="btn btn-info viewMyPlaylists">View My Playlists</button>
+      </div>
       <h3>Deletion</h3>
       <div class="subsection">
           <p><button id="removeAllMine" class="btn btn-danger">Remove All My Items</button></p>
