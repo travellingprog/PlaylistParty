@@ -4,6 +4,18 @@
 
 (function() {
 
+  Template.options.anonStatus = function() {
+    var playlist = Playlist.findOne();
+    return (playlist && (playlist.type === 'anonymous')) ? "YES" : "NO";
+  };
+
+
+  Template.options.isOwner = function() {
+    var playlist = Playlist.findOne();
+    return (playlist && (playlist.owner.indexOf(Meteor.userId()) < 0)) ?  
+      false : true;
+  };  
+
 
   Template.options.events({
     'click .question': function(e) {
@@ -12,6 +24,15 @@
       $(e.currentTarget).parent().next('.answer').toggle(400, function () {
         $('html, body').animate({scrollTop: newOffset}, 400);
       });
+    },
+
+    'click #changeAnonStatus': function() {
+      if (Playlist.findOne().type === 'anonymous') {
+        Meteor.call('setPlaylistType', PlaylistParty.listID, 'publicUsers');
+      }
+      else if (Playlist.findOne().type === 'publicUsers') {
+        Meteor.call('setPlaylistType', PlaylistParty.listID, 'anonymous');
+      }
     },
 
     'click #removeAllMine': function() {

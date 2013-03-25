@@ -56,6 +56,17 @@
         I'm a <strong>currently unemployed</strong> web developer. I made this mainly to showcase my skills... but also because it's a ton of fun to use! And I would love to hear from you! E-mail me at <strong><a href="mailto:e.cardenasmendez@gmail.com">e.cardenasmendez@gmail.com</a></strong>.
       </div>
     </div>
+    <h3>Playlist Info</h3>
+    <div class="subsection">
+      <p><small>Note: Only the playlist owner(s) can change these settings.</small></p>
+      <p>
+        Anonymous users are allowed to add music/videos: 
+        <strong>{{anonStatus}} </strong>
+        {{#if isOwner}}
+          <button id="changeAnonStatus" class="btn btn-link">(change)</button>
+        {{/if}}
+      </p>
+    </div>
     {{#if currentUser}}
       <h3>Deletion</h3>
       <div class="subsection">
