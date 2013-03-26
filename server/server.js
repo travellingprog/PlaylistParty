@@ -224,6 +224,23 @@
   });
 
 
+  ///////////////////////////////////////////////////////////////////////////////
+  // E-mail Template
+
+  Accounts.emailTemplates.siteName = "PlaylistParty";
+  Accounts.emailTemplates.from = "PlaylistParty <noreply@playlistparty.net>";
+
+  Accounts.emailTemplates.resetPassword.subject = function() {
+    return "PlaylistParty - reset password link";
+  };
+
+  Accounts.emailTemplates.resetPassword.text = function (user, url) {
+    return "Hi " + user.username + "!\n\nForgot your password? No problem! "
+    + "Just follow the link below to reset your password:\n\n"
+    + url + "\n\nCheers!";
+  };
+
+
 
   //////////////////////////////////////////////////////////////////////////////
   // Publishing functions

@@ -238,7 +238,7 @@
         if (volume === newVolume) return;
         if (fromPlayer && this.pauseUpdates) return;
 
-        if (! fromPlayer) curPlayer.setVolume(newVolume);
+        if ((! fromPlayer) && curPlayer) curPlayer.setVolume(newVolume);
         volume = newVolume;
         BoomboxDeps['volume'].changed();
       };
