@@ -191,7 +191,7 @@
   Meteor.methods({
 
     // this retrieves info on this user's playlists
-    'getMyPlaylistsInfo': function() {
+    getMyPlaylistsInfo: function() {
       if (! this.userId) {
         throw new Meteor.Error(400, 'Invalid data provided.');
       }
@@ -208,7 +208,7 @@
     },
 
     // this changes the username
-    'changeUsername': function(name) {
+    changeUsername: function(name) {
       if ((! this.userId) || (! is('String', name)) || (name.length < 3)) {
         throw new Meteor.Error(400, 'Invalid data provided.');
       }
@@ -220,6 +220,35 @@
       }
 
       Meteor.users.update(this.userId, {$set: {'username': name}});
+    },
+
+
+    // this allows users to like or dislike an item
+    toggleLike: function(playlistID, itemID) {
+      if (! this.userId) throw new Meteor.Error(400, 'Invalid data provided.'); 
+
+      var playlist = Playlist.findOne(playlistID);
+      if (! playlist) throw new Meteor.Error(400, 'Invalid data provided.');
+
+      var item = _.find(playlist.items, function(thisItem) {
+        return thisItem.id === itemID;
+      });
+      if (! item) throw new Meteor.Error(400, 'Invalid data provided.');
+
+      if (item.addedBy === this.userId) {
+        throw new Meteor.Error(403, 'User cannot do this action.')
+      }
+
+      if (_.contains(item.likes, this.userId)) {
+        Playlist.update(
+        {_id: playlistID, "items.id": itemID},
+        {$pull: {"items.$.likes": this.userId}});
+      }
+      else {
+        Playlist.update(
+        {_id: playlistID, "items.id": itemID},
+        {$addToSet: {"items.$.likes": this.userId}});
+      }
     }
   });
 

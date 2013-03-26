@@ -18,7 +18,8 @@
         "title" : "Bitch Don't Kill My Vibe (Instrumental) Reprod. Wonya Love",
         "pic" : "https://i.ytimg.com/vi/B5bFf2Bn9yI/default.jpg",
         "addedBy" : "user._id",
-        "id": "uniqueIDno" // (new Meteor.Collection.ObjectID()).toHexString()
+        "id": "uniqueIDno", // (new Meteor.Collection.ObjectID()).toHexString()
+        "likes": ["user1._id", "user2._id", "etc"]
       }
   }]
 }

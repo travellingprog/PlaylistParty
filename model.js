@@ -7,7 +7,7 @@
   //////////////////////////////////////////////////////////////////////////////
   // Collection allowances and denials
 
-  // allow correct insertion of items     // PROBABLY MAKE THIS A METEOR METHOD, FOLLOWED BY AN AUTO USER-ADDITION
+  // allow correct insertion of items
   Playlist.allow({
     update: function(userID, doc, fieldNames, modifier) {
 

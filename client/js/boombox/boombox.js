@@ -271,7 +271,8 @@
               "title": item.title,
               "pic": item.pic,
               "addedBy": userID || '',
-              "id": (new Meteor.Collection.ObjectID()).toHexString()
+              "id": (new Meteor.Collection.ObjectID()).toHexString(),
+              "likes": []
             }
           }
         },
