@@ -70,7 +70,20 @@
     {{#if currentUser}}
       <h3>User Info</h3>
       <div class="subsection">
-        <button class="btn btn-info viewMyPlaylists">View My Playlists</button>
+        <p><button class="btn btn-info viewMyPlaylists">View My Playlists</button></p>
+        <p>
+          <form id="editingName" class="form-inline">
+            <input id="changeUsernameText" type="text" maxlength="25" size="25">
+            <button id="changeUsernameCancel" class="btn">Cancel</button>
+            <button id="changeUsernameUpdate" class="btn btn-primary">Update</button>
+            <br><small><span id="changeUsernameError" style="color:red"></span></small>
+          </form>
+          <button id="changeUsernameBtn" class="btn btn-info">Change Username</button>
+        </p>
+        <p>
+          <strong>To change password:</strong><br>
+          You can only change your password on this website if the account was created on this website (i.e. you are not using a Facebook or Twitter account). If so, click on your username in the top-right corner. The menu should show an option to "Change password".
+        </p>
       </div>
       <h3>Deletion</h3>
       <div class="subsection">

@@ -212,6 +212,10 @@ body {
     vertical-align: baseline;
   }
 
+  #editingName {
+    display: none;
+  }
+
 
 /* tracks */
 

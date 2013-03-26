@@ -17,6 +17,28 @@
   };  
 
 
+  var changeUsername = function() {
+    var name = $('#changeUsernameText').val();
+    if (name.length < 3) {
+      $('#changeUsernameError').text('3 characters minimum');
+      $('#changeUsernameText').focus();
+      return;
+    }
+
+    Meteor.call('changeUsername', name, function(error) {
+      if (! error) {
+        $('#editingName').hide();
+        $('#changeUsernameBtn').show();
+        $('#changeUsernameError').text('');
+      }
+      else {
+        $('#changeUsernameError').text(error.reason);
+        $('#changeUsernameText').focus();
+      }
+    });
+  };
+
+
   Template.options.events({
     'click .question': function(e) {
       e.preventDefault();
@@ -51,6 +73,33 @@
           Session.set("showUserPlaylists", true);
         }
       });
+    },
+
+    'click #changeUsernameBtn': function() {
+      var textbox = $('#changeUsernameText');
+      textbox.val(Meteor.user().username);
+      $('#changeUsernameBtn').hide();
+      $('#editingName').show();
+      textbox.focus().select();
+    },
+
+    'keypress #changeUsernameText': function(event) {
+      if (event.which == 13) {
+        event.preventDefault();
+        changeUsername();
+      }
+    },
+
+    'click #changeUsernameCancel': function(e) {
+      e.preventDefault();
+      $('#changeUsernameError').text('');
+      $('#editingName').hide();
+      $('#changeUsernameBtn').show();
+    },
+
+    'click #changeUsernameUpdate': function(e) {
+      e.preventDefault();
+      changeUsername();
     },
 
     'click #removeAllMine': function() {

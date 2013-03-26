@@ -178,16 +178,19 @@
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // User creation and personal list of playlists
+  // User functions
 
 
-  // Make the profile only have a playlists array
+  // Make the profile of new user accounts only have a playlists array
   Accounts.onCreateUser(function(options, user) {
     user.profile = {playlists: []};
     return user;
   });
 
+
   Meteor.methods({
+
+    // this retrieves info on this user's playlists
     'getMyPlaylistsInfo': function() {
       if (! this.userId) {
         throw new Meteor.Error(400, 'Invalid data provided.');
@@ -202,6 +205,21 @@
       }
 
       return result;
+    },
+
+    // this changes the username
+    'changeUsername': function(name) {
+      if ((! this.userId) || (! is('String', name)) || (name.length < 3)) {
+        throw new Meteor.Error(400, 'Invalid data provided.');
+      }
+
+      var nameTaken = Meteor.users.findOne({'username': name});
+
+      if (nameTaken) {
+        throw new Meteor.Error(409, 'Username already exists.')
+      }
+
+      Meteor.users.update(this.userId, {$set: {'username': name}});
     }
   });
 
