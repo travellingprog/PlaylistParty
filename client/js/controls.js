@@ -43,14 +43,16 @@
   };
 
   function phoneVolTracking () {
-    Deps.autorun(function () {
+    Deps.autorun(function (comp) {
       $phoneVol.tooltip('destroy');
       $phoneVol.tooltip({
         title: (Math.round(boombox.getVolume()) ).toString(),
-        delay: 250 //,
-        // trigger: 'hover click'
+        delay: 250,
+        trigger: 'hover'
       });
-      $phoneVol.tooltip('show');
+      if (! comp.firstRun) {
+        $phoneVol.tooltip('show');  
+      }
     });
   }
 

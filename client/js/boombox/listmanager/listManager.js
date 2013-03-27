@@ -34,7 +34,7 @@
       frames = [];
       curFrame = null;
       timeoutID = null;
-      scroll = true;
+      scroll = false;
     }
 
 
@@ -59,10 +59,10 @@
         if (shuffle) removeFromShuffle(id);
         removeFromLivePlayers(id);
         if (nextFrame) {
+          scroll = true;
           self.setCurFrame(nextFrame);
         }
         else {
-          scroll = false;
           self.setNextPlayer();    
         }          
          
@@ -77,7 +77,6 @@
 
 
     this.add = function(id) {
-      scroll = false;
       frames.push(id);
       if (shuffle) addToShuffle(id);
       if (! curFrame) {
@@ -105,7 +104,7 @@
       if (timeoutID) clearTimeout(timeoutID);
 
       // scroll to current frame
-      if (activeTab === '#tracks') {
+      if (scroll && activeTab === '#tracks') {
         var firstPOffset = $('.player :first').offset().top;
         var newOffset = $('#' + curFrame).parent().offset().top - firstPOffset;
         $('html, body').animate({scrollTop: newOffset}, 400);
@@ -142,13 +141,13 @@
       prevPlayer = createPlayer(getPrevFrame());
       if (scroll && (activeTab === '#tracks'))
       {
+        scroll = false // sets it back to default for next run
         timeoutID = setTimeout( function() {
           self.scrollToCurPlayer();
-        }, 250);  
+        }, 250);
       }
       else
       {
-        scroll = true;
         timeoutID = setTimeout( function() {
           self.setPictures();
         }, 5000);
@@ -258,11 +257,13 @@
 
 
     this.next = function() {
+      scroll = true;
       this.setCurFrame(getNextFrame());
     };
 
 
     this.prev = function() {
+      scroll = true;
       this.setCurFrame(getPrevFrame());
     };
 
