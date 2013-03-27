@@ -42,7 +42,9 @@
         PlaylistParty.listID = Playlist.findOne()._id;
         trackItems();
         Session.set("playlistSet", true);
-        window.parent.document.title = "Playlist Party - " + Playlist.findOne().name;
+        var newTitle = "Playlist Party - " + Playlist.findOne().name;
+        window.parent.document.title = newTitle;
+        $('meta[property="og:title"]').attr('content', newTitle);
         if (Session.get("showCreatePlaylist")) {
           Session.set("showCreatePlaylist", false);
           Session.set("showNewPlaylistAlert", true);  

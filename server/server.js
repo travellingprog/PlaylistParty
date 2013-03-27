@@ -183,7 +183,14 @@
 
   // Make the profile of new user accounts only have a playlists array
   Accounts.onCreateUser(function(options, user) {
-    user.profile = {playlists: []};
+    if (options.profile) {
+      // user.profile = options.profile;
+      user.username = options.profile.name;
+    }
+    // else {
+      user.profile = {}  ;
+    // }
+    user.profile.playlists = [];
     return user;
   });
 
