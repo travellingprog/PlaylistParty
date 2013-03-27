@@ -17,15 +17,16 @@
   // between documents.
   Items = new Meteor.Collection(null);
 
-  // This reactive data source will contain the playlist.items array
-  var items = [];
-  var itemsDeps = new Deps.Dependency;
-
-
+  
   // The PlaylistParty global variable. This variable will contain global settings
   // and functions for that our app needs
   PlaylistParty = {};
   PlaylistParty.activeTab = '#tracks';
+
+
+  // This reactive data source will contain the playlist.items array
+  var items = [];
+  var itemsDeps = new Deps.Dependency;
 
 
   // Collection subscription, that occurs either when someone visits a URL, or when

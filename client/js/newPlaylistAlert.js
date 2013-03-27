@@ -16,7 +16,7 @@
 
     'click .blockAnonymous': function() {
       Meteor.call('setPlaylistType', PlaylistParty.listID, 'publicUsers', function (error) {
-        if (error) alert(error);
+        if (error) alert(error.reason);
       });
       Template.newPlaylistAlert.ownerNotice = '';
       Session.set("showNewPlaylistAlert", false);

@@ -25,7 +25,7 @@
     'click .viewMyPlaylists': function() {
       Meteor.call('getMyPlaylistsInfo', function(error, result) {
         if (error) {
-          alert(error);
+          alert(error.reason);
         } 
         else {
           Template.userPlaylists.list = result;

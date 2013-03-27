@@ -52,13 +52,13 @@
       if (Playlist.findOne().type === 'anonymous') 
       {
         Meteor.call('setPlaylistType', PlaylistParty.listID, 'publicUsers', function (error) {
-          if (error) alert(error);
+          if (error) alert(error.reason);
         });
       }
       else if (Playlist.findOne().type === 'publicUsers') 
       {
         Meteor.call('setPlaylistType', PlaylistParty.listID, 'anonymous', function (error) {
-          if (error) alert(error);
+          if (error) alert(error.reason);
         });
       }
     },
@@ -66,7 +66,7 @@
     'click .viewMyPlaylists': function() {
       Meteor.call('getMyPlaylistsInfo', function(error, result) {
         if (error) {
-          alert(error);
+          alert(error.reason);
         } 
         else {
           Template.userPlaylists.list = result;

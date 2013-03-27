@@ -12,9 +12,15 @@
         {{#if myItem_Or_AnonymousItem}}
           <button type="button" class="remItem btn btn-link" style="float: left">remove</button>
         {{else}}
-          <button type="button" class="btn btn-mini btn-success" style="float: left"><i class="icon-thumbs-up icon-white"></i> Nice!</button>
+          {{#if currentUser}}
+            {{#if unliked}}
+              <button type="button" class="toggleLike btn btn-mini btn-success" style="float: left"><i class="icon-thumbs-up icon-white"></i> Nice!</button>
+            {{else}}
+              <button type="button" class="toggleLike btn btn-mini btn-warning" style="float: left"><i class="icon-thumbs-down icon-white"></i> never mind</button>
+            {{/if}}
+          {{/if}}
         {{/if}}
-        <p class="text-right">0 <i class="icon-thumbs-up"></i></p>        
+        <p class="text-right">{{likesCount}} <i class="icon-thumbs-up"></i></p>        
       </div>
     </div>
   </div>

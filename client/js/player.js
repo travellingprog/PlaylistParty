@@ -64,6 +64,22 @@
     return ((this.addedBy === Meteor.userId()) || (this.addedBy === ''));
   };
 
+  template.unliked = function() {
+    var item = _.find(PlaylistParty.items(), function (thisItem) {
+      return thisItem.id === this.id;
+    }, this);
+
+    return item ?  (! _.contains(item.likes, Meteor.userId())) : false;
+  };
+
+  template.likesCount = function() {
+    var item = _.find(PlaylistParty.items(), function (thisItem) {
+      return thisItem.id === this.id;
+    }, this);
+
+    return item ? item.likes.length : 0;
+  };
+
   template.events({
     'click button.remItem' : function () {
       boombox.removeItem(this);
@@ -72,6 +88,13 @@
     'click a.pic' : function(e) {
       e.preventDefault();
       boombox.clickedPicture(this.id);
+    },
+
+    'click .toggleLike': function() {
+      Meteor.call('toggleLike', PlaylistParty.listID, this.id, function (error) {
+        if (error) alert(error.reason);
+      });
+      boombox.updateMyPlaylists();
     }
   });
 

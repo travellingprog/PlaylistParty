@@ -29,7 +29,7 @@
         curTime = 0;
         curTimeLabel = 0;
         totalTime = 0;
-        volume = 80;
+        volume = 100;
         curFrameID = null;
         curPlayer = null;
         reset = true;
@@ -282,21 +282,14 @@
         });
 
         if (userID) {
-          // Set this playlist as the first one in the user's profile
-          var myPlaylists = Meteor.user().profile.playlists;
-          if (myPlaylists[0] !== PlaylistParty.listID) 
-          {
-            myPlaylists = _.without(myPlaylists, PlaylistParty.listID);
-            myPlaylists.splice(0,0,PlaylistParty.listID);
-            myPlaylists = _.first(myPlaylists, 20);
-            Meteor.users.update(userID, 
-                                {$set: {'profile.playlists': myPlaylists}});  
-          }
+          this.updateMyPlaylists();
           
           if (Playlist.findOne().owner.length === 0) 
           {
             // If this playlist has no owner, set this user as the owner
-            Meteor.call('addOwner', PlaylistParty.listID, userID);
+            Meteor.call('addOwner', PlaylistParty.listID, userID, function (error) {
+              if (error) alert(error.reason);
+            });
             // ... and ask if anonymous users should be allowed
             Template.newPlaylistAlert.setOwnerNotice();
             Session.set("showNewPlaylistAlert", true);
@@ -304,7 +297,9 @@
           else if (Playlist.findOne().users.indexOf(userID) < 0)
           {
             // ..else, just make sure this user is in the playlist's Users array
-            Meteor.call('addUserToPlaylist', PlaylistParty.listID, userID);  
+            Meteor.call('addUserToPlaylist', PlaylistParty.listID, userID, function (error) {
+              if (error) alert(error.reason);
+            });  
           }
         }
       };
@@ -341,6 +336,24 @@
           }
         }
       };
+
+
+      this.updateMyPlaylists = function() {
+        var userID  = Meteor.userId();
+        if (! userID) return;
+
+        // Set this playlist as the first one in the user's profile
+        var myPlaylists = Meteor.user().profile.playlists;
+        if (myPlaylists[0] !== PlaylistParty.listID) 
+        {
+          myPlaylists = _.without(myPlaylists, PlaylistParty.listID);
+          myPlaylists.splice(0,0,PlaylistParty.listID);
+          myPlaylists = _.first(myPlaylists, 20);
+          Meteor.users.update(userID, 
+                              {$set: {'profile.playlists': myPlaylists}});  
+        }  
+      };
+      
 
 
       this.clickedPicture = function(id) {
