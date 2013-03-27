@@ -235,7 +235,7 @@ body {
     margin-left: 2px;
     margin-right: 2px;
     padding: 0px 1px 10px 1px;
-    border: 1px solid #DDDDDD;
+    border: 1px solid #ABABAB;
     border-radius: 4px 4px 4px 4px;
     min-height: 332px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
@@ -535,11 +535,11 @@ body {
 @media (max-width: 767px) {
 
   #loginButtons {
-    top: 60px;
+    top: 56px;
   }
 
   .tab-content {
-    padding-top: 80px;
+    padding-top: 76px;
   }
 
   /* header */

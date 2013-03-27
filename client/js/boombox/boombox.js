@@ -208,7 +208,7 @@
       this.setCurTime = function(newTime, fromPlayer) {
         if (fromPlayer && this.pauseUpdates) return;
         curTime = newTime;
-        if (! fromPlayer) curPlayer.setNewTime(newTime);
+        if ((! fromPlayer) && curPlayer) curPlayer.setNewTime(newTime);
         this.setCurTimeLabel(newTime);
       };
 

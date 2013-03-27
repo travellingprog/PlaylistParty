@@ -224,7 +224,6 @@
 
   var closeSearch = function() {
     $('#deskMenu .active').tab("show");
-    $(window).scrollTop(PlaylistParty.previousScrollTop);
     selection.reset();
     Session.set("searching", false);
     Template.search.resetSearchEngines();

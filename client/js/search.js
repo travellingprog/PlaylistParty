@@ -176,9 +176,6 @@
       template.searchAPI[i].engine.search(this.query);
     }
 
-    // save current scroll position
-    PlaylistParty.previousScrollTop = $(window).scrollTop();
-
     // show the page
     Session.set("searching", true);
     $('#normSearchBtn').tab('show');
