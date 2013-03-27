@@ -256,6 +256,7 @@
   ///////////////////////////////////////////////////////////////////////////////
   // E-mail Template
 
+  process.env.MAIL_URL = "smtp://noreply%40playlistparty.net:PlaylistParty@mail.gandi.net:587";
   Accounts.emailTemplates.siteName = "PlaylistParty";
   Accounts.emailTemplates.from = "PlaylistParty <noreply@playlistparty.net>";
 
