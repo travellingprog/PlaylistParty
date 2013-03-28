@@ -55,6 +55,9 @@ body {
 
 .tab-pane {
   margin: 0px auto;
+  background-color: white;
+  z-index: 1000;
+  position: relative;
 }
 
 .tab-pane:after {    /* Clear space for the footer */
@@ -227,6 +230,7 @@ body {
 
   #tracks.tab-pane {
     display: block !important;
+    z-index: 10 !important;
     visibility: hidden;
     position: fixed;
   }
