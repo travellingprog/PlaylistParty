@@ -54,10 +54,14 @@ body {
 }
 
 .tab-pane {
-  margin: 0px auto;
+  margin: 0px 0px;
   background-color: white;
   z-index: 1000;
   position: relative;
+}
+
+.tab-pane-content {
+  margin: 0px auto;
 }
 
 .tab-pane:after {    /* Clear space for the footer */
@@ -438,9 +442,12 @@ body {
   }
 
   .tab-pane {
-    max-width: 1400px;
     padding-left: 20px;
     padding-right: 20px;
+  }
+
+  .tab-pane-content {
+    max-width: 1400px;
   }
 }
 
@@ -457,9 +464,12 @@ body {
   }
 
   .tab-pane {
-    max-width: 1120px;
     padding-left: 10px;
     padding-right: 10px;
+  }
+
+  .tab-pane-content {
+    max-width: 1120px;
   }
 }
 
@@ -476,9 +486,12 @@ body {
   }
 
   .tab-pane {
-    max-width: 840px;
     padding-left: 10px;
     padding-right: 10px;
+  }
+
+  .tab-pane-content {
+    max-width: 840px;
   }
 }
 
@@ -605,7 +618,7 @@ body {
       display: none !important;
     }
 
-  .tab-pane {
+  .tab-pane-content {
     max-width: 560px;
   }
 }
@@ -643,7 +656,7 @@ body {
     }
 
 
-  .tab-pane {
+  .tab-pane-content {
     max-width: 280px;
   }
 
