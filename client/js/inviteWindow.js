@@ -37,7 +37,7 @@
 
 
   template.url = function() {
-    return 'http://' + window.location.host + '/' + PlaylistParty.playlistURL;
+    return 'http://' + window.location.host + '/' + PlaylistParty.playlistURL + '/';
   };
   
   Template.inviteWindow.events({

@@ -7,7 +7,7 @@
   var createPlaylist = function(name) {
     Meteor.call('createPlaylist', new Date(), name, function(error, newID) {
       if (! error) {
-        window.History.pushState(null, null, newID);
+        window.History.pushState(null, null, newID + '/');
         PlaylistParty.subscribe(newID);
       } else {
         Template.initialPage.errorMessage(error.reason);
