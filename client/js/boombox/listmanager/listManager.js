@@ -5,7 +5,6 @@
 
 (function() {
 
-  var activeTab = PlaylistParty.activeTab;
   var createYtPlayer = PlaylistParty.createYtPlayer;
   var createScPlayer = PlaylistParty.createScPlayer;
 
@@ -104,7 +103,7 @@
       if (timeoutID) clearTimeout(timeoutID);
 
       // scroll to current frame
-      if (scroll && activeTab === '#tracks') {
+      if (scroll && PlaylistParty.activeTab === '#tracks') {
         var firstPOffset = $('.player :first').offset().top;
         var newOffset = $('#' + curFrame).parent().offset().top - firstPOffset;
         $('html, body').animate({scrollTop: newOffset}, 400);
@@ -139,7 +138,7 @@
     // Creates the media player for the previous track
     this.setPrevPlayer = function () {
       prevPlayer = createPlayer(getPrevFrame());
-      if (scroll && (activeTab === '#tracks'))
+      if (scroll && (PlaylistParty.activeTab === '#tracks'))
       {
         scroll = false // sets it back to default for next run
         timeoutID = setTimeout( function() {
