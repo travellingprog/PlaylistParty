@@ -64,8 +64,13 @@
       };
 
       this.togglePlaying = function() {
+        if (! curPlayer) return;
         playing = ! playing;
-        playing ? curPlayer.play() : curPlayer.pause();
+
+        // check that we are not in the midst of setting a new curPlayer
+        if (curPlayer.id === curFrameID) { 
+          playing ? curPlayer.play() : curPlayer.pause();  
+        }
         BoomboxDeps['playing'].changed();
       };
 
