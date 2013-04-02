@@ -108,8 +108,9 @@
     if (newState === state.PLAYING) {
       if (this.boombox.curPlayerID() !== this.id) {
         this.boombox.clickedPlayer(this.id);
-      } 
+      }
       this.boombox.setPlaying(true, "fromPlayer");
+      this.updateDuration();
       return;
     }
 

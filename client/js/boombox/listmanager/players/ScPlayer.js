@@ -37,6 +37,7 @@
             self.boombox.clickedPlayer(self.id);
           } 
           self.boombox.setPlaying(true, "fromPlayer");
+          self.updateDuration();
         });
 
 
