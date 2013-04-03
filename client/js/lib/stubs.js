@@ -38,6 +38,7 @@
         var modifier = {$push: {}};
         modifier.$push["items." + itemIndex + ".likes"] = this.userId;
       }
+      Playlist.update(playlistID, modifier);
     }
   });
 
