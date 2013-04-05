@@ -60,8 +60,8 @@
     return result;
   };
 
-  template.myItem_Or_AnonymousItem = function () {
-    return ((this.addedBy === Meteor.userId()) || (this.addedBy === ''));
+  template.notMyItem = function() {
+    return (this.addedBy !== Meteor.userId());
   };
 
   template.unliked = function() {
@@ -78,6 +78,10 @@
     }, this);
 
     return item ? item.likes.length : 0;
+  };
+
+  template.anonymousItem = function () {
+    return (this.addedBy === '');
   };
 
   template.events({

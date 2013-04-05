@@ -9,18 +9,23 @@
       {{/constant}}
       <div class="player-bottom">
         added by {{{username}}}<br>
-        {{#if myItem_Or_AnonymousItem}}
-          <button type="button" class="remItem btn btn-link" style="float: left">remove</button>
-        {{else}}
-          {{#if currentUser}}
+        {{#if currentUser}}
+          {{#if notMyItem}}
             {{#if unliked}}
               <button type="button" class="toggleLike btn btn-mini btn-success" style="float: left"><i class="icon-thumbs-up icon-white"></i> Nice!</button>
             {{else}}
               <button type="button" class="toggleLike btn btn-mini btn-warning" style="float: left"><i class="icon-thumbs-down icon-white"></i> never mind</button>
             {{/if}}
+          {{else}}
+            <button type="button" class="remItem btn btn-link" style="float: left">remove</button>
           {{/if}}
+        {{else}}
+          <small class="text-success" style="float: left">sign in to vote</small>
         {{/if}}
-        <p class="text-right">{{likesCount}} <i class="icon-thumbs-up"></i></p>        
+        <p class="text-right" style="margin-bottom: 0px">{{likesCount}} <i class="icon-thumbs-up"></i></p>
+        {{#if anonymousItem}}
+          <button type="button" class="remItem btn btn-link">remove</button>
+        {{/if}}
       </div>
     </div>
   </div>

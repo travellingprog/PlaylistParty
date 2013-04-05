@@ -174,6 +174,10 @@
     return boombox.isPlaying() ? "/Pause.png" : "/Play.png";
   };
 
+  template.playOrPauseMini = function() {
+    return boombox.isPlaying() ? "icon-pause" : "icon-play";
+  };
+
 
   template.events({
 
@@ -197,17 +201,17 @@
     },
 
 
-    'click #prev' : function() {
+    'click .prev' : function() {
       boombox.prev();
     },
 
 
-    'click #play' : function () {
+    'click .play' : function () {
       boombox.togglePlaying();
     },
 
 
-    'click #next' : function() {
+    'click .next' : function() {
       boombox.next();
     },
 

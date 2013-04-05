@@ -26,9 +26,9 @@
 
         
         <!-- Prev, Play, Next -->
-        <button id="prev" type="button" class="btn btn-danger"><img src="/Prev.png" width="16" height="14"></button>
-        <button id="play" type="button" class="btn btn-danger"><img src="{{playOrPause}}" width="21" height="21"></button>
-        <button id="next" type="button" class="btn btn-danger"><img src="/Next.png" width="16" height="14"></button>
+        <button id="prev" type="button" class="prev btn btn-danger"><img src="/Prev.png" width="16" height="14"></button>
+        <button id="play" type="button" class="play btn btn-danger"><img src="{{playOrPause}}" width="21" height="21"></button>
+        <button id="next" type="button" class="next btn btn-danger"><img src="/Next.png" width="16" height="14"></button>
         
         
         <!-- LS Phone, Tablet, Desktop: Volume -->
@@ -50,6 +50,9 @@
 
     <div id="controlbox-minimized" class="{{showMinimize}}">
       <button id="openControls" type="button" class="btn btn-link btn-small"><i class="icon-chevron-up"></i></button>
+      <button type="button" class="prev btn btn-danger btn-small"><i class="icon-fast-backward icon-white"></i></button>
+      <button type="button" class="play btn btn-danger btn-small"><i class="{{playOrPauseMini}} icon-white"></i></button>
+      <button type="button" class="next btn btn-danger btn-small"><i class="icon-fast-forward icon-white"></i></button>
     </div>
 
   <!-- </div> -->

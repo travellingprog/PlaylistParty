@@ -42,5 +42,7 @@
   {{> header}}
   <div id="loginButtons">{{loginButtons align="right"}}</div>
   {{> tabs}}
-  {{> controls}}
+  {{#if playlistSet}}
+    {{> controls}}
+  {{/if}}
 </template>
