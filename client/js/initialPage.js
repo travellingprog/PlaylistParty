@@ -17,6 +17,10 @@
     return Session.get('checkedURL');
   };
 
+  Template.initialPage.viewOrNot = function() {
+    return (Meteor.userId()) ? "viewMyPlaylists" : "disabled";
+  };
+
   Template.initialPage.events({
     'click #launchCreation': function() {
       Session.set('showCreatePlaylist', true);

@@ -40,7 +40,13 @@
   {{/isolate}}
 
   {{> header}}
-  <div id="loginButtons">{{loginButtons align="right"}}</div>
+  <div id="loginBar">
+    <!-- Phone: Playlist Name -->
+    {{#if playlistSet}}
+      <p class="visible-phone" style="float: left; margin-left: 35px;"><strong>{{playlistName}}</strong></p>
+    {{/if}}
+    <p style="text-align: right;">{{loginButtons align="right"}}</p>
+  </div>
   {{> tabs}}
   {{#if playlistSet}}
     {{> controls}}

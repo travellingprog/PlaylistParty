@@ -43,12 +43,11 @@ body {
   }
 
 
-#loginButtons {
+#loginBar {
   background-color: white;
   display: block;
   position: fixed;
   right: 15px;
-  text-align: right;
   max-height: 20px;
   width: 100%;
   z-index: 1025;
@@ -500,7 +499,7 @@ body {
 /* Tablet and Desktop Only */
 @media (min-width: 768px) {
 
-  #loginButtons {
+  #loginBar {
     top: 84px;
   }
 
@@ -552,7 +551,7 @@ body {
 /* Landscape Phone And Portrait Phone */
 @media (max-width: 767px) {
 
-  #loginButtons {
+  #loginBar {
     top: 56px;
   }
 
