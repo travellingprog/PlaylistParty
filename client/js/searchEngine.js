@@ -16,12 +16,12 @@
   }
 
   Selection.prototype.get = function() {
-    Deps.depend(this.selectionDeps);
+    this.selectionDeps.depend();
     return this.arr;
   };
 
   Selection.prototype.length = function() {
-    Deps.depend(this.selectionDeps);
+    this.selectionDeps.depend();
     return this.arr.length;
   }; 
 
