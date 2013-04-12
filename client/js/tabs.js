@@ -13,6 +13,10 @@
     return Session.get("playlistSet");
   };
 
+  template.isActive = function(tab) {
+    return (PlaylistParty.activeTab === tab) ? "active": "";
+  };
+
 
   Meteor.startup(function () {
 
