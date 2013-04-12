@@ -1,7 +1,7 @@
 <template name="tabs">
 
   <div class="tab-content">
-    <div id ="tracks" class="tab-pane active">
+    <div id ="tracks" class="tab-pane {{isActive "#tracks"}}">
       <div class="tab-pane-content">
         {{#isolate}}
         {{#if playlistSet}}
@@ -12,17 +12,17 @@
         {{/isolate}}
       </div>
     </div>
-    <div id="list" class="tab-pane">
+    <div id="list" class="tab-pane {{isActive "#list"}}">
       <div class="tab-pane-content">
         <strong>List: coming soon...</strong>
       </div>
     </div>
-    <div id="options" class="tab-pane">
+    <div id="options" class="tab-pane {{isActive "#options"}}">
       <div class="tab-pane-content">
         {{> options}}
       </div>
     </div>
-    <div id="search" class="tab-pane">
+    <div id="search" class="tab-pane {{isActive "#search"}}">
       <div class="tab-pane-content">
         {{> search}}
       </div>
