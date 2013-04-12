@@ -17,14 +17,14 @@
               <button type="button" class="toggleLike btn btn-mini btn-warning" style="float: left"><i class="icon-thumbs-down icon-white"></i> never mind</button>
             {{/if}}
           {{else}}
-            <button type="button" class="remItem btn btn-link" style="float: left">remove</button>
+            <p style="float:left; clear:left;"><button type="button" class="remItem btn btn-link">remove</button></p>
           {{/if}}
         {{else}}
           <small class="text-success" style="float: left">sign in to vote</small>
         {{/if}}
-        <p class="text-right" style="margin-bottom: 0px">{{likesCount}} <i class="icon-thumbs-up"></i></p>
+        <p class="text-right" style="margin-bottom:0px;">{{likesCount}} <i class="icon-thumbs-up"></i></p>
         {{#if anonymousItem}}
-          <button type="button" class="remItem btn btn-link">remove</button>
+          <p style="float:left; clear:left;"><button type="button" class="remItem btn btn-link">remove</button></p>
         {{/if}}
       </div>
     </div>
