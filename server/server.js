@@ -26,7 +26,18 @@
 
 
   Meteor.methods({
+
+    /**
+     * Create a new playlist in the database
+     * 
+     * @param userDate date  from client-side, to build 1st part of the playlist URL
+     * @param name     title provided by client for this playlist
+     * @return         url   of the new playlist, unless an error is thrown
+     */
     createPlaylist: function (userDate, name) {
+
+      // check the arguments' type 
+
       if (! (is('Date', userDate)  &&  is('String', name) )) {
         throw new Meteor.Error(400, 'Invalid data provided.');
       }
@@ -34,6 +45,9 @@
       if ((name.length > 25) || (name.length === 0)) {
         throw new Meteor.Error(400, 'Invalid playlist name.');
       }
+
+
+      // compose a unique URL
 
       var newURL;
     
@@ -57,6 +71,9 @@
         }
       } while (! uniqueURL);
 
+
+      // Create the new playlist document in our database
+
       var playlist_id = Playlist.insert({
         'name': name,
         'url': newURL,
@@ -67,14 +84,19 @@
         'items': []
       });
 
+
+      // if the user is signed-in, add his userID to the playlist's owners and users arrays...
+
       if (this.userId) {
         Playlist.update(playlist_id, {$push: {'owner': this.userId }});
         Playlist.update(playlist_id, {$push: {'users': this.userId }});
 
-        // Set this playlist as the first one in the user's profile
+        // ... and set this playlist as the first one in the user's profile
         var userPlaylists = Meteor.users.findOne(this.userId).profile.playlists;
         userPlaylists.splice(0,0,playlist_id);
-        userPlaylists = _.first(userPlaylists, 20);
+        if (userPlaylists.length > 20) {
+          userPlaylists.length = 20;
+        }
         Meteor.users.update(this.userId, 
                             {$set: {'profile.playlists': userPlaylists}});
       }
