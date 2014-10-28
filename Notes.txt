@@ -1,0 +1,410 @@
+The JS folder should have more structure overall.
+
+The templates folder should have more structure overall.
+
+Session variable should either always be used for displaying/hiding sections of the app, or not at all.
+
+The "playlistSet" functions should all point to one same function.
+
+Probably shouldn't be setting an ID for each player.
+
+Should I add support for IE 9/10? Or maybe limit it to Chrome?
+
+Check out iron-router.
+
+jQuery selections should be limited to be searched within a specific widget's element.
+
+Would be good to create documentation automatically.
+
+Set text limit to 100 characters.
+
+Possibly replace Bootstrap with your own classes/styling.
+
+Would be nice to exercise more of a functional-programming-style in the coding.
+
+
+
+
+PlaylistParty.js
+----------------
+PlaylistParty.js shouldn't be inside of lib
+
+Not a fan of how Items is this client-only Collection... might be not way around that.
+
+Should make my global variables creation more evident.
+
+trackItems(): The 'changed' handler could be cleaned up a little
+
+The Accounts configuration seems out of place.
+
+
+
+startup.js
+-----------
+showTime() should be in some general utilities file
+
+loatYTplayerAPI(): I think it could use $('head').prepend()
+
+getYoutubeID(): I believe this stopped being used
+
+Meteor.startup(): Soundcloud ID probably shouldn't be here
+
+The biggest issue is I have no idea where the code jumps to after this....
+
+
+
+server.js
+---------
+The data validation methods could probably be written in one place, accessible to both the client and the server.
+
+Not a big file, but this should probably be split among different files.
+
+createPlaylist(): Just do one Playlist.update()
+
+addOwner(): Those TO DOs are important. Try to do just one Playlist.update()
+
+addUserToPlaylist(): Don't like how this depends on items.addedBy to be updated first.
+
+addChars(): Should not hardcode 36, but instead use chars.length
+
+Accounts.onCreateUser: Not sure why that commented out stuff was there.
+
+getMyPlaylistsInfo: Is there a way to get all playlists with one Meteor call?
+
+Email: does this Mail URL still work?
+
+Meteor.publish('allUserData'): Does this just return usernames?
+
+
+
+playlistparty.css
+-----------------
+This really needs to be split into multiple preprocess files, with less IDs.
+
+
+
+playlistparty.html
+-------------------
+Should be renamed index.html
+
+Is there a way to finally make Facebook share playlists well?
+
+
+
+page.html
+---------
+All the modals at the top are not colliding simply because the state is being well maintained across the board. But this seems very fragile.
+
+Very easy to miss {{> header}} and {{> tabs}}... but these are the most important parts!
+
+
+
+page.js
+-------
+In the end, this file and the Session variables are what determine what is currently being displayed. That's quite difficult to follow logically.
+
+
+
+header.html
+-----------
+This seems mostly okay.
+
+
+header.js
+---------
+Code seems fine, but I wonder what else occurs when an update is installed.
+
+
+
+tabs.html
+---------
+Probably shouldn't be using as many IDs as I am here.
+
+This points to {{> tracks}}, {{> initialPage}}, {{> options}} and {{> search}}.
+
+
+tabs.js
+-------
+Would be good that the buttons that toggle tabs (whether it be from the desk menu buttons, the phone menu or the search button).
+
+
+
+initialPage.html
+----------------
+Another use of IDs that may not be necessary.
+
+This needs a  lot of styling improvements.
+
+
+initialPage.js
+--------------
+Template.initialPage.errorMessage(): Should I be adding functions to a Template object that isn't set for a reactive template block?
+
+checkedURL is not a good variable name. What we actually mean is that the url loaded is not for a playlist.
+
+
+
+createPlaylist.html
+-------------------
+Might not need to use IDs here.
+
+Modal body might just need to say "Playlist Name"
+
+
+createPlaylist.js
+-----------------
+Separate checkName() and createPlaylist(), or call checkName() from createPlaylist().
+
+createPlaylist() should probably just send Date.now().
+
+What's the support for window.History.pushState.
+
+This does Meteor.call('createPlaylist')
+
+
+
+userPlaylists.html
+------------------
+max-height shouldn't be set here.
+
+userPlaylists.js
+----------------
+This controller should be retrieving the list by itself.
+
+
+
+tracks.html
+-----------
+This points to {{> instructions}} and {{> player}}.
+
+tracks.js
+---------
+noItems() return value can be simplified
+
+
+
+instructions.html
+-----------------
+The width and height can be specified with CSS.
+
+instructions.js
+---------------
+This shows showMoreInfo
+
+
+
+moreInfo.html
+-------------
+Remove direct styling.
+
+Points to {{> toolslist}}.
+
+
+moreInfo.js
+-----------
+Looks good.
+
+
+
+toolslist.html
+--------------
+Looks good.
+
+
+
+player.html
+-----------
+Does every player need its own ID?
+
+Would be nice to specify which info I want to appear at the bottom of the player, and not worry about fitting it all together.
+
+
+player.js
+---------
+Don't hardcode the image width in the code.
+
+I believe template.rendered() is only supposed to be called once, but for some reason that wasn't the case. This  may have been fixed.
+
+template.trackNo(): Must be a more efficient way of doing this than calling _.pluck for each track.
+
+template.description(): Should probably do this logic inside the template itself.
+
+template.unliked(): I can simplify this _.find to a one-liner, and the return calculation.
+
+template.likesCount(): I can simplify this _.find to a one-liner, and the return calculation.
+
+
+
+boombox.js
+----------
+Boombox and listManager are tightly correlated.
+
+Overall, it sucks to have to worry about input from within the player itself.
+
+Playlist.boombox = new Boombox() should be at the top of the file.
+
+Use "self" instead of "that".
+
+8 different reactive variables. That can probably be simplified.
+
+"reset" is to indicate whether to set the new player to 0 or not? It's weird.
+
+
+this.updatePlayerInfo(): What causes updates to be paused? What other object calls this function.
+
+this.togglePlaying(): Would be nice if curPlayer just reacted to the playing state.
+
+this.setPlaying(): Don't like that you have to provide fromPlayer variable. Would be nice if curPlayer just reacted to the playing state.
+
+this.toggleShuffle(): Would be nice if listManager just reacted to the shuffle state.
+
+this.curPlayerID(): return curPlayer && curPlayer.id. Could use _.constant too.
+
+this.setCurPlayer(): Why is 'curPlayerRemoved' needed?
+
+this.prev(), this.next(): I hate the whole thing with oldCurPlayer
+
+this.playerAdded = listManager.add;
+
+this.playerDestroyed = listManager.remove;
+
+this.insertItem(): Should just modify item and insert it directly. Shouldn't have a call to a global function (Template.newPlaylistAlert.setOwnerNotice()) inside this.
+
+this.removeItem(): _.first can be replaced with a slice() command. Could also use a sort() function to move PlaylistParty.listID.
+
+this.updateMyPlaylists(): Shouldn't be inside boombox.js. Can simplify the re-sorting of the user's playlists.
+
+Reactive functions:
+  - this.isPlaying
+  - this.onShuffle
+  - this.onLoop
+  - this.curPlayerID
+  - this.curFrameID
+  - this.getCurTimeLabel
+  - this.getTotalTime
+  - this.getVolumne
+
+
+
+listManager.js
+--------------
+Probably a simpler way of tracking what's happening than with 3 different arrays (livePlayers, shuffleSequence, frames).
+
+If we use the variable "self", we should assign all public functions to it.
+
+There must be a better way of handling rapid Prev/Next presses.
+
+A lot of this is begging for some Promises goodness.
+
+When setTimeout() only calls another function, no need to wrap that inside an anonymous function.
+
+this.remove(): This is where were doing that curPlayerRemoved weirdness. Why would getNextFrame() not come back with truthy? How does self.setNextPlayer remedy that?
+
+this.setCurFrame(): It's weird how we have both this function and boombox.setCurFrameID(). The cancelling of the timeout should be at the top
+
+this.setCurPlayer(): Again, weird that we must also call a boombox.setCurPlayer() function.
+
+createPlayer(): The _.find() methods could be simplified.
+
+setToPicture(): Don't hardcode the image widths here.
+
+removeFromLivePlayers(): Could just use _.without or something similar.
+
+getNextFrame(): Can simplifiy these with 'var arr = (shuffle) ? shuffleSequence : frames;'
+
+this.setShuffle(): Maybe the shuffleSequene should always begin with the current frame.
+
+addToShuffle(): Should this instead add the item somewhere before the end of the shuffleSequence?
+
+
+
+YtPlayer.js
+-----------
+Use "self" instead of that.
+
+Need to be able to make the Player size variable.
+
+Need a clean way to coordinate between the Youtube players and the boombox settings.
+
+YtPlayer.prototype.updateVolume(): This should really be handled with some kind of event handler.
+
+YtPlayer.prototype.updateCurrentTime(): This should really be handled with some kind of event handler.
+
+YtPlayer.onPlayerReady(): The quality needs to be variable.
+
+YtPlayer.onPlayerStateChange(): is state.PAUSE still called before state.ENDED?
+
+
+
+ScPlayer.js
+-----------
+Need to be able to make the Player size variable.
+
+Do I still need to do this manipulation with oEmbed.html?
+
+The use of self.scplayer.bind() is weird... from the documentation?
+
+ScPlayer.prototype.updateVolume(): Does SoundCloud still not offer anu volume control.
+
+ScPlayer.prototype.updateCurrentTime(): This should really be handled with some kind of event handler.
+
+
+
+controls.html
+-------------
+There's way too many classes in this.
+
+Put icons and sizes in the CSS.
+
+There should be less things to just seperate phone vs desktop layout.
+
+
+controls.js
+-----------
+What's tComp1, tComp2 and vComp? Reactive functions.
+
+This is the part that pauses updates, so the controls reflect what's currently being set.
+
+template.curTrack(): Could use _.findIndex().
+
+
+
+search.html
+-----------
+Looks good.
+
+
+search.js
+---------
+ytSearch(): Use 'self' instead of 'that'. Shouldn't keep my YouTube key here. Do I still need to use 'intitle:' for the query? Is there a better way to get the artist now? Should I still use Meteor.http.get?
+
+scSearch(): Use 'self' instead of 'that'.
+
+template.searchAPI: Shouldn't hardcode the size here.
+
+template.start(): What does Meteor.flush() do?
+
+template.resetSearchEngines(), template.searching(): What calls these functions?
+
+
+
+searchEngine.html
+-----------------
+Too many embedded "if" blocks.
+
+
+
+searchEngine.js
+---------------
+There's an interesting thing here where the context for the template is actually being created and passed in from search.js. That pattern could really be useful.
+
+template.someResult(): return !!this.engine.results.length
+
+template.result(): rename this to template.pageResults()
+
+template.SelectOrUnselect(): return (this.selected) ? "Unselect" : "Select";
+
+scrollToLogo(): This is called for the case when you're going Prev/Next through the search results.
+
+closeSearch(): Don't like how this relies on '#deskMenu active'.
+
