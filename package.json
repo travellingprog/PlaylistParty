@@ -1,0 +1,29 @@
+{
+  "name": "playlistparty",
+  "version": "2.0.0-0",
+  "description": "Create collaborative playlists in realtime",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/travellingprog/PlaylistParty.git"
+  },
+  "keywords": [
+    "music",
+    "playlist",
+    "collaboration",
+    "realtime"
+  ],
+  "author": "Erick Cardenas",
+  "license": "UNLICENSED",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/travellingprog/PlaylistParty/issues"
+  },
+  "homepage": "https://github.com/travellingprog/PlaylistParty#readme"
+}
