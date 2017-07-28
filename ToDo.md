@@ -21,6 +21,18 @@
 - [ ] 2nd user logs in and join the same chat room
 
 
+## Chat Room
+
+- [ ] Add routing with /chat route
+- [ ] Create user based on FB login
+- [ ] Set up a Firebase DB
+- [ ] Initiate unique chat room (+ route) with a button
+- [ ]
+
+
 ## Backlog
 
+- [ ] Use Firebase Hosting or Google Cloud Storage
+- [ ] Find a cheap short-url domain, for sharing... `plpa.pw`
+- [ ] Look into building a PWA (progressive web app)
 - [ ] Add a "Terms Of Service" URL, for the Auth login
