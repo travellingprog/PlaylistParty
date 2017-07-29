@@ -1,21 +1,15 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter, Route } from 'react-router-dom';
+import Login from './Login';
+import Chat from './Chat';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to PlaylistParty</h2>
-        </div>
-        <p className="App-intro">
-          <div id="firebaseui-auth-container"></div>
-        </p>
-      </div>
-    );
-  }
-}
+const App = () => (
+  <BrowserRouter>
+    <div>
+      <Route exact path="/" component={Login}/>
+      <Route path="/chat" component={Chat}/>
+    </div>
+  </BrowserRouter>
+);
 
 export default App;

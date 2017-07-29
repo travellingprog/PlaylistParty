@@ -1,24 +1,24 @@
-.App {
+.Login {
   text-align: center;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
+.Login-logo {
+  animation: Login-logoSpin infinite 20s linear;
   height: 80px;
 }
 
-.App-header {
+.Login-header {
   background-color: #222;
   height: 150px;
   padding: 20px;
   color: white;
 }
 
-.App-intro {
+.Login-intro {
   font-size: large;
 }
 
-@keyframes App-logo-spin {
+@keyframes Login-logoSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
